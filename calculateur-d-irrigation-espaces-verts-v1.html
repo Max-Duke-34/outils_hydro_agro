@@ -16,7 +16,13 @@
   body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--ink); line-height: 1.5; }
   header { background: linear-gradient(135deg, var(--green-dark), var(--green)); color: #fff; padding: 24px 16px 20px; text-align: center; }
   header h1 { margin: 0 0 6px; font-size: 1.5rem; }
-  header p { margin: 0; opacity: .92; font-size: .95rem; max-width: 720px; margin-inline: auto; }
+  header p { margin: 0; opacity: .92; font-size: .95rem; }
+  .head { display: flex; align-items: center; gap: 16px; justify-content: space-between; flex-wrap: wrap; }
+  .head .logo img { display: block; width: 76px; height: 76px; border-radius: 50%; background: #fff; }
+  .head .titles { flex: 1; text-align: center; min-width: 220px; }
+  .bmc { display: inline-block; background: #FFDD00; color: #111; font-weight: 700; font-size: .9rem; padding: 12px 18px; border-radius: 10px; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+  .bmc:hover { background: #ffeb4d; }
+  @media (max-width: 560px) { .head .titles { order: 3; flex-basis: 100%; } }
   .banner { max-width: 900px; margin: 14px auto 0; background: rgba(255,255,255,.12); border: 1px dashed rgba(255,255,255,.5); border-radius: 8px; color: rgba(255,255,255,.85); font-size: .8rem; padding: 8px 12px; text-align: center; }
   main { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
@@ -48,10 +54,15 @@
 </head>
 <body>
 <header>
-  <h1>💧 Calculateur d'irrigation — espaces verts</h1>
-  <p>Sélectionnez une plante, un climat, un sol et une pente : l'outil calcule les doses, durées et fréquences d'arrosage d'avril à septembre. Gratuit, pour un arrosage raisonné qui économise l'eau.</p>
-  <div class="banner">— emplacement bannière / partenaire —</div>
-</header>
+    <div class="head">
+      <div class="logo"><img src="logo.png" alt="Logo Outils hydro &amp; agro" /></div>
+      <div class="titles">
+        <h1>💧 Calculateur d'irrigation — espaces verts</h1>
+        <p>Sélectionnez une plante, un climat, un sol et une pente : l'outil calcule les doses, durées et fréquences d'arrosage d'avril à septembre. Gratuit, pour un arrosage raisonné qui économise l'eau.</p>
+      </div>
+      <a class="bmc" href="https://www.buymeacoffee.com/Max_Duke" target="_blank" rel="noopener">☕ Soutenez mon travail</a>
+    </div>
+  </header>
 <main>
   <section class="card" style="margin-bottom:16px">
     <h2>1. Votre situation</h2>
@@ -113,7 +124,8 @@
 </main>
 <footer>
   Outil développé par <strong>Maxime Duquesne</strong> — conseil et ingénierie en hydraulique (irrigation, espaces verts, eaux pluviales).<br>
-  Version 1.0 — résultats indicatifs, à adapter au contexte de chantier. <a href="mentions.html">Mentions légales</a>
+  Version 1.0 — résultats indicatifs, à adapter au contexte de chantier. <a href="mentions.html">Mentions légales</a><br>
+  <a href="plantes.html">Sélecteur de plantes</a> · <a href="lexique.html">Lexique botanique</a> · Code sous licence MIT · Données et contenus sous licence CC BY 4.0 (crédit : Maxime Duquesne)
 </footer>
 
 <script>
@@ -422,6 +434,9 @@ function rendre() {
         <div class="stat"><div class="v">${fmt2(m3)} m³</div><div class="l">consommation saisonnière sur ${fmt(surface,0)} m²</div></div>
         <div class="stat"><div class="v">${fmt2(cout)} €</div><div class="l">coût de l'eau estimé (${fmt2(prix)} €/m³)</div></div>
       </div>
+      <div class="note" style="margin:12px 0 0">
+        <strong>💬 Aller un peu plus loin ?</strong> Les doses affichées correspondent aux besoins calculés selon la littérature scientifique. Des essais menés dans plusieurs filières montrent qu'une contrainte hydrique légère et maîtrisée n'affecte pas durablement les plantes d'espaces verts : vous pouvez raisonnablement <strong>réduire ces doses d'environ 5 %</strong> sans risque pour vos plantations — soit <strong>${fmt2(m3*0.05)} m³ d'eau économisés</strong> sur la saison pour votre surface (${fmt2(m3*0.05*1000)} litres, ≈ ${fmt2(cout*0.05)} € d'économie). À l'échelle d'une commune ou d'un quartier, l'impact cumulé sur la ressource devient rapidement significatif.
+      </div>
     </section>`;
 
   $("comparaison").innerHTML = `
@@ -437,5 +452,8 @@ $("type").addEventListener("change", majEspeces);
 initSelects();
 rendre();
 </script>
+<!-- Mesure d'audience GoatCounter : sans cookie, sans donnée personnelle (voir mentions.html).
+     Après création du compte sur goatcounter.com, remplacez "outils-hydro-agro" par votre identifiant. -->
+<script data-goatcounter="https://outils-hydro-agro.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

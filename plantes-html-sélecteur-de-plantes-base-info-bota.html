@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Choisir une plante — Outils hydro &amp; agro</title>
+<meta name="description" content="Sélecteur de plantes pour espaces verts : trouvez la plante adaptée à votre contexte (sol, exposition, climat, hauteur, floraison, usage) parmi une base de 100 plantes de référence." />
+<style>
+  :root {
+    --green: #2e7d32; --green-dark: #1b5e20; --green-light: #e8f5e9;
+    --ink: #1f2d27; --muted: #5f6f66; --bg: #f4f8f5; --card: #ffffff;
+    --border: #d8e3dc;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--ink); line-height: 1.5; }
+  header { background: linear-gradient(135deg, var(--green-dark), var(--green)); color: #fff; padding: 24px 16px 20px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.5rem; }
+  header p { margin: 0; opacity: .92; font-size: .95rem; max-width: 720px; margin-inline: auto; }
+  .head { display: flex; align-items: center; gap: 16px; justify-content: space-between; flex-wrap: wrap; max-width: 1000px; margin: 0 auto; }
+  .head .logo img { display: block; width: 76px; height: 76px; border-radius: 50%; background: #fff; }
+  .head .titles { flex: 1; text-align: center; min-width: 240px; }
+  .bmc { display: inline-block; background: #FFDD00; color: #111; font-weight: 700; font-size: .9rem; padding: 12px 18px; border-radius: 10px; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+  .bmc:hover { background: #ffeb4d; }
+  @media (max-width: 560px) { .head .titles { order: 3; flex-basis: 100%; } }
+  main { max-width: 1000px; margin: 0 auto; padding: 20px 16px 60px; }
+  .filtres { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .filtres h2 { margin: 0 0 12px; font-size: 1.05rem; color: var(--green-dark); border-bottom: 2px solid var(--green-light); padding-bottom: 8px; }
+  .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  label { display: block; font-size: .8rem; color: var(--muted); margin: 0 0 4px; font-weight: 600; }
+  select, input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; font-size: .9rem; color: var(--ink); }
+  .actions { margin-top: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  button { background: var(--green); color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; font-size: .9rem; font-weight: 600; cursor: pointer; }
+  button:hover { background: var(--green-dark); }
+  .count { color: var(--muted); font-size: .9rem; margin: 0 0 14px; }
+  .plante { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+  .plante h3 { margin: 0; font-size: 1.05rem; color: var(--green-dark); }
+  .plante .latin { font-style: italic; color: var(--muted); font-size: .9rem; margin: 2px 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .chip { background: var(--green-light); color: var(--green-dark); border-radius: 20px; padding: 3px 10px; font-size: .8rem; font-weight: 600; }
+  .chip.bleu { background: #e1f5fe; color: #0277bd; }
+  .kv { font-size: .88rem; margin: 4px 0; }
+  .kv b { color: var(--green-dark); }
+  .liens { margin-top: 8px; font-size: .85rem; }
+  .liens a { color: var(--green); font-weight: 600; text-decoration: none; margin-right: 14px; }
+  .noresult { text-align: center; color: var(--muted); padding: 30px 0; }
+  footer { text-align: center; font-size: .8rem; color: var(--muted); padding: 24px 16px 40px; }
+  footer a { color: var(--green); font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="logo"><img src="logo.png" alt="Logo Outils hydro &amp; agro" /></div>
+    <div class="titles">
+      <h1>🌱 Sélecteur de plantes</h1>
+      <p>Indiquez votre contexte (sol, exposition, climat, hauteur, floraison, usage) : l'outil liste les plantes de la base qui y répondent. Pensé pour l'aménagement paysager et la construction d'une culture végétale.</p>
+    </div>
+    <a class="bmc" href="https://www.buymeacoffee.com/Max_Duke" target="_blank" rel="noopener">☕ Soutenez mon travail</a>
+  </div>
+</header>
+<main>
+  <section class="filtres">
+    <h2>1. Vos critères</h2>
+    <div class="fgrid">
+      <div>
+        <label for="q">Recherche libre</label>
+        <input type="search" id="q" placeholder="nom, genre, famille…" autocomplete="off" />
+      </div>
+      <div>
+        <label for="f-type">Type</label>
+        <select id="f-type"><option value="">— tous —</option></select>
+      </div>
+      <div>
+        <label for="f-feuil">Feuillage</label>
+        <select id="f-feuil"><option value="">— tous —</option></select>
+      </div>
+      <div>
+        <label for="f-expo">Exposition</label>
+        <select id="f-expo"><option value="">— toutes —</option></select>
+      </div>
+      <div>
+        <label for="f-sol">Type de sol</label>
+        <select id="f-sol"><option value="">— tous —</option></select>
+      </div>
+      <div>
+        <label for="f-ph">Nature du sol (pH)</label>
+        <select id="f-ph"><option value="">— tous —</option></select>
+      </div>
+      <div>
+        <label for="f-clim">Climat</label>
+        <select id="f-clim"><option value="">— tous —</option></select>
+      </div>
+      <div>
+        <label for="f-crois">Croissance</label>
+        <select id="f-crois"><option value="">— toutes —</option></select>
+      </div>
+      <div>
+        <label for="f-mois">En fleur en…</label>
+        <select id="f-mois"><option value="">— tout l'année —</option></select>
+      </div>
+      <div>
+        <label for="f-hmax">Hauteur max (m)</label>
+        <input type="number" id="f-hmax" min="0" step="0.1" placeholder="ex. 3" />
+      </div>
+    </div>
+    <div class="actions"><button id="reset">Réinitialiser les critères</button></div>
+  </section>
+  <p class="count" id="count"></p>
+  <div id="liste"></div>
+  <p class="hint" style="font-size:.82rem;color:var(--muted);margin-top:18px">NB : les plantes incomplètes dans la base n'apparaissent que si le critère manquant n'est pas actif. La base est mise à jour via le fichier <code>plante.csv</code> du dépôt.</p>
+</main>
+<footer>
+  Base végétale « info bota », outil pédagogique développé par <strong>Maxime Duquesne</strong>.<br>
+  <a href="irrigation.html">Calculateur d'irrigation</a> · <a href="lexique.html">Lexique botanique</a> · <a href="mentions.html">Mentions légales</a><br>
+  Code sous licence MIT · Contenus sous licence CC BY 4.0
+</footer>
+<script>
+// ---------- Chargement des données (plante.csv, séparateur ;) ----------
+let PLANTES = [];
+const $ = id => document.getElementById(id);
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const sansAccent = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+function parseCSV(text) {
+  const lignes = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim() !== "");
+  const entetes = lignes[0].split(";");
+  return lignes.slice(1).map(l => {
+    const cellules = []; let cur = ""; let q = false;
+    for (let i = 0; i < l.length; i++) {
+      const c = l[i];
+      if (q) { if (c === '"') { if (l[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === ";") { cellules.push(cur); cur = ""; }
+      else cur += c;
+    }
+    cellules.push(cur);
+    const o = {};
+    entetes.forEach((h, i) => o[h] = (cellules[i] || "").trim());
+    return o;
+  });
+}
+const num = v => { const s = (v || "").replace(",", "."); const f = parseFloat(s); return isNaN(f) ? null : f; };
+const moisNum = v => { const s = sansAccent((v||"").toLowerCase()); const i = MOIS.findIndex(m => sansAccent(m) === s); return i === -1 ? null : i + 1; };
+
+function chargerDonnees() {
+  return fetch("plante.csv")
+    .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+    .then(txt => {
+      PLANTES = parseCSV(txt).map(o => ({
+        nom: o["Nom"], latin: o["Latin"], cultivar: o["Cultivar"], famille: o["Famille"],
+        type: o["Type"] || null, feuillage: o["Feuillage"] || null, croissance: o["Croissance"] || null,
+        hauteur: num(o["Hauteur (m)"]), largeur: num(o["Largeur (m)"]), port: o["Port"] || null,
+        floDebut: moisNum(o["Début floraison"]), floFin: moisNum(o["Fin floraison"]), floType: o["Type floraison"],
+        sol: o["Type de sol"] || null, ph: o["pH"] || null, climat: o["Climat"] || null,
+        expoIdeale: o["Exposition idéale"] || null, expoAcceptee: o["Exposition acceptée"] || null,
+        arrosage: o["Arrosage"] || null, remarque: o["Remarque"], tracant: o["Traçant"] || null,
+        rusticite: num(o["Rusticité (°C)"]), util1: o["Utilisation 1"], util2: o["Utilisation 2"],
+        infos: o["Infos"], wiki: o["Fiche wiki"], photo: o["Photos"]
+      })).filter(p => p.nom);
+      init();
+    })
+    .catch(() => {
+      $("count").textContent = "";
+      $("liste").innerHTML = '<p class="noresult">⚠ Données non chargées : le fichier <code>plante.csv</code> doit se trouver dans le même dossier que la page (voir le dépôt GitHub).</p>';
+    });
+}
+
+// ---------- Filtres et affichage ----------
+function remplirSelect(id, valeurs) {
+  $(id).innerHTML = '<option value="">—</option>' + valeurs.map(v => `<option value="${v}">${v}</option>`).join("");
+}
+function distinctes(prop) {
+  return [...new Set(PLANTES.map(p => p[prop]).filter(Boolean))].sort((a,b) => a.localeCompare(b,"fr"));
+}
+function init() {
+  remplirSelect("f-type", distinctes("type"));
+  remplirSelect("f-feuil", distinctes("feuillage"));
+  remplirSelect("f-sol", distinctes("sol"));
+  remplirSelect("f-ph", distinctes("ph"));
+  remplirSelect("f-clim", distinctes("climat"));
+  remplirSelect("f-crois", distinctes("croissance"));
+  $("f-expo").innerHTML = '<option value="">—</option><option value="plein soleil">plein soleil</option><option value="mi ombre">mi ombre</option>';
+  $("f-mois").innerHTML = '<option value="">—</option>' + MOIS.map((m,i) => `<option value="${i+1}">${m[0].toUpperCase()+m.slice(1)}</option>`).join("");
+  filtrer();
+}
+
+function fleuriEn(p, mois) {
+  if (!p.floDebut || !p.floFin) return false;
+  if (p.floDebut <= p.floFin) return mois >= p.floDebut && mois <= p.floFin;
+  return mois >= p.floDebut || mois <= p.floFin;
+}
+function expoOk(p, v) {
+  return (p.expoIdeale && p.expoIdeale.includes(v)) || (p.expoAcceptee && p.expoAcceptee.includes(v));
+}
+
+function filtrer() {
+  if (!PLANTES.length) return;
+  const q = sansAccent($("q").value.trim().toLowerCase());
+  const c = {
+    type: $("f-type").value, feuillage: $("f-feuil").value, expo: $("f-expo").value,
+    sol: $("f-sol").value, ph: $("f-ph").value, climat: $("f-clim").value,
+    croissance: $("f-crois").value, mois: parseInt($("f-mois").value) || null,
+    hmax: parseFloat($("f-hmax").value) || null
+  };
+  const res = PLANTES.filter(p => {
+    if (q && !sansAccent((p.nom+" "+p.latin+" "+p.famille+" "+p.util1+" "+p.util2).toLowerCase()).includes(q)) return false;
+    if (c.type && p.type !== c.type) return false;
+    if (c.feuillage && p.feuillage !== c.feuillage) return false;
+    if (c.expo && !expoOk(p, c.expo)) return false;
+    if (c.sol && p.sol !== c.sol) return false;
+    if (c.ph && p.ph !== c.ph) return false;
+    if (c.climat && p.climat !== c.climat) return false;
+    if (c.croissance && p.croissance !== c.croissance) return false;
+    if (c.mois && !fleuriEn(p, c.mois)) return false;
+    if (c.hmax !== null && (p.hauteur === null || p.hauteur > c.hmax)) return false;
+    return true;
+  }).sort((a,b) => sansAccent(a.nom).localeCompare(sansAccent(b.nom),"fr"));
+
+  $("count").textContent = res.length + (res.length === 1 ? " plante correspond" : " plantes correspondent") + " à vos critères";
+  $("liste").innerHTML = res.length ? res.map(p => `
+    <article class="plante">
+      <h3>${p.nom}</h3>
+      <div class="latin">${p.latin}${p.cultivar ? " '" + p.cultivar + "'" : ""}</div>
+      <div class="chips">
+        ${p.famille ? `<span class="chip bleu">${p.famille}</span>` : ""}
+        ${p.type ? `<span class="chip">${p.type}</span>` : ""}
+        ${p.feuillage ? `<span class="chip">${p.feuillage}</span>` : ""}
+        ${p.climat ? `<span class="chip">climat ${p.climat}</span>` : ""}
+        ${p.tracant ? `<span class="chip">${p.tracant}</span>` : ""}
+      </div>
+      ${p.hauteur !== null ? `<p class="kv"><b>Taille :</b> ${p.hauteur} m de haut${p.largeur !== null ? " × " + p.largeur + " m de large" : ""}${p.port ? ", port " + p.port : ""}</p>` : ""}
+      ${(p.sol || p.ph) ? `<p class="kv"><b>Sol :</b> ${p.sol || "—"}${p.ph ? " · " + p.ph : ""}</p>` : ""}
+      ${p.expoIdeale ? `<p class="kv"><b>Exposition :</b> ${p.expoIdeale}${p.expoAcceptee ? " (accepte : " + p.expoAcceptee + ")" : ""}</p>` : ""}
+      ${p.floDebut ? `<p class="kv"><b>Floraison :</b> ${MOIS[p.floDebut-1]} → ${MOIS[p.floFin-1]}${p.floType ? " · " + p.floType : ""}</p>` : ""}
+      ${p.croissance ? `<p class="kv"><b>Croissance :</b> ${p.croissance}</p>` : ""}
+      ${p.arrosage ? `<p class="kv"><b>Arrosage :</b> ${p.arrosage === "non" ? "non nécessaire (rustique)" : p.arrosage}</p>` : ""}
+      ${p.rusticite !== null ? `<p class="kv"><b>Rusticité :</b> jusqu'à ${p.rusticite} °C</p>` : ""}
+      ${(p.util1 || p.util2) ? `<p class="kv"><b>Utilisation :</b> ${[p.util1, p.util2].filter(Boolean).join(", ")}</p>` : ""}
+      ${p.remarque ? `<p class="kv"><b>À noter :</b> ${p.remarque}</p>` : ""}
+      ${p.infos ? `<p class="kv"><b>Info :</b> ${p.infos}</p>` : ""}
+      <div class="liens">
+        ${p.wiki ? `<a href="${p.wiki}" target="_blank" rel="noopener">📖 Fiche (wiki)</a>` : ""}
+        ${p.photo ? `<a href="${p.photo}" target="_blank" rel="noopener">🖼 Photos</a>` : ""}
+      </div>
+    </article>`).join("")
+    : `<p class="noresult">Aucune plante de la base ne répond à tous ces critères. Essayez d'en retirer un ou deux.</p>`;
+}
+document.addEventListener("input", filtrer);
+document.addEventListener("change", filtrer);
+$("reset").addEventListener("click", () => {
+  ["q","f-type","f-feuil","f-expo","f-sol","f-ph","f-clim","f-crois","f-mois","f-hmax"].forEach(id => $(id).value = "");
+  filtrer();
+});
+chargerDonnees();
+</script>
+<!-- Mesure d'audience GoatCounter : sans cookie, sans donnée personnelle (voir mentions.html).
+     Remplacez "outils-hydro-agro" par votre identifiant GoatCounter. -->
+<script data-goatcounter="https://outils-hydro-agro.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lexique botanique — Outils hydro &amp; agro</title>
+<meta name="description" content="Lexique botanique illustré : 125 termes techniques de botanique pour les paysagistes (morphologie, anatomie, physiologie végétale), avec planche des formes de feuilles." />
+<style>
+  :root {
+    --green: #2e7d32; --green-dark: #1b5e20; --green-light: #e8f5e9;
+    --ink: #1f2d27; --muted: #5f6f66; --bg: #f4f8f5; --card: #ffffff;
+    --border: #d8e3dc;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--ink); line-height: 1.55; }
+  header { background: linear-gradient(135deg, var(--green-dark), var(--green)); color: #fff; padding: 24px 16px 20px; text-align: center; }
+  header h1 { margin: 0 0 6px; font-size: 1.5rem; }
+  header p { margin: 0; opacity: .92; font-size: .95rem; max-width: 720px; margin-inline: auto; }
+  .head { display: flex; align-items: center; gap: 16px; justify-content: space-between; flex-wrap: wrap; max-width: 900px; margin: 0 auto; }
+  .head .logo img { display: block; width: 76px; height: 76px; border-radius: 50%; background: #fff; }
+  .head .titles { flex: 1; text-align: center; min-width: 240px; }
+  .bmc { display: inline-block; background: #FFDD00; color: #111; font-weight: 700; font-size: .9rem; padding: 12px 18px; border-radius: 10px; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+  .bmc:hover { background: #ffeb4d; }
+  @media (max-width: 560px) { .head .titles { order: 3; flex-basis: 100%; } }
+  main { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+  .searchbox { display: flex; gap: 10px; margin-bottom: 16px; }
+  .searchbox input { flex: 1; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; background: #fff; }
+  .searchbox input:focus { outline: 2px solid var(--green); }
+  .count { color: var(--muted); font-size: .9rem; margin: 0 0 14px; }
+  .term { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .term h2 { margin: 0 0 6px; font-size: 1rem; color: var(--green-dark); letter-spacing: .3px; }
+  .term p { margin: 0; font-size: .95rem; }
+  .term .ex, .term .voir { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+  .term .ex b, .term .voir b { color: var(--ink); }
+  .plate { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 26px; }
+  .plate h2 { margin: 0 0 10px; font-size: 1.05rem; color: var(--green-dark); border-bottom: 2px solid var(--green-light); padding-bottom: 8px; }
+  .plate img { width: 100%; height: auto; border-radius: 8px; }
+  footer { text-align: center; font-size: .8rem; color: var(--muted); padding: 24px 16px 40px; }
+  footer a { color: var(--green); font-weight: 600; text-decoration: none; }
+  .noresult { text-align: center; color: var(--muted); padding: 30px 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="logo"><img src="logo.png" alt="Logo Outils hydro &amp; agro" /></div>
+    <div class="titles">
+      <h1>🌿 Lexique botanique</h1>
+      <p>125 termes techniques de botanique pour le paysagiste : morphologie, anatomie et physiologie végétale. Avec la planche illustrée des formes de feuilles.</p>
+    </div>
+    <a class="bmc" href="https://www.buymeacoffee.com/Max_Duke" target="_blank" rel="noopener">☕ Soutenez mon travail</a>
+  </div>
+</header>
+<main>
+  <div class="searchbox"><input type="search" id="q" placeholder="Rechercher un terme ou une notion… (ex. phloème, vivace, palmier)" autocomplete="off" /></div>
+  <p class="count" id="count"></p>
+  <div id="liste"></div>
+  <section class="plate">
+    <h2>🖼 La planche des feuilles : formes, limbes, bordures, apex</h2>
+    <img src="formes-feuilles.jpg" alt="Planche illustrée : feuilles simples et composées, bordures du limbe, base, apex et fixation des feuilles" />
+    <p style="font-size:.85rem;color:var(--muted);margin:10px 0 0">Feuilles simples et composées (entière, lancéolée, pennée, bipennée…), bordures du limbe (dentée, crénelée, lobée…), base, apex et fixation. Idéal pour décrire précisément une feuille observée sur le terrain.</p>
+  </section>
+</main>
+<footer>
+  Lexique issu de « Dicobota », outil pédagogique développé par <strong>Maxime Duquesne</strong>.<br>
+  <a href="irrigation.html">← Calculateur d'irrigation</a> · <a href="plantes.html">Sélecteur de plantes</a> · Code sous licence MIT · Contenus sous licence CC BY 4.0 · <a href="mentions.html">Mentions légales</a>
+</footer>
+<script>
+// ---------- Chargement des données (lexique-terme.csv, séparateur ;) ----------
+let TERMES = [];
+const $ = id => document.getElementById(id);
+const sansAccent = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+function parseCSV(text) {
+  const lignes = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim() !== "");
+  const entetes = lignes[0].split(";");
+  return lignes.slice(1).map(l => {
+    const cellules = []; let cur = ""; let q = false;
+    for (let i = 0; i < l.length; i++) {
+      const c = l[i];
+      if (q) { if (c === '"') { if (l[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === ";") { cellules.push(cur); cur = ""; }
+      else cur += c;
+    }
+    cellules.push(cur);
+    const o = {};
+    entetes.forEach((h, i) => o[h] = (cellules[i] || "").trim());
+    return o;
+  });
+}
+
+function chargerDonnees() {
+  return fetch("lexique-terme.csv")
+    .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+    .then(txt => {
+      TERMES = parseCSV(txt).map(o => [o["Terme"] || "", o["Définition"] || "", o["Exemples"] || "", o["Voir aussi"] || ""])
+        .filter(t => t[0]);
+      TERMES.sort((a, b) => sansAccent(a[0]).localeCompare(sansAccent(b[0]), "fr"));
+      afficher($("q").value);
+    })
+    .catch(() => {
+      $("count").textContent = "";
+      $("liste").innerHTML = '<p class="noresult">⚠ Données non chargées : le fichier <code>lexique-terme.csv</code> doit se trouver dans le même dossier que la page (voir le dépôt GitHub).</p>';
+    });
+}
+
+function afficher(q) {
+  if (!TERMES.length) return;
+  const query = sansAccent(q.trim().toLowerCase());
+  const resultats = TERMES.filter(t => {
+    if (!query) return true;
+    return sansAccent((t[0] + " " + t[1] + " " + t[2]).toLowerCase()).includes(query);
+  });
+  $("count").textContent = resultats.length + (resultats.length === 1 ? " terme" : " termes") + (query ? " trouvés" : " de botanique");
+  $("liste").innerHTML = resultats.length ? resultats.map(t => `
+    <article class="term">
+      <h2>${t[0]}</h2>
+      <p>${t[1]}</p>
+      ${t[2] ? `<p class="ex"><b>Exemples :</b> ${t[2]}</p>` : ""}
+      ${t[3] ? `<p class="voir"><b>Voir aussi :</b> ${t[3]}</p>` : ""}
+    </article>`).join("")
+    : `<p class="noresult">Aucun terme ne correspond à « ${q} ». Essayez un autre mot-clé.</p>`;
+}
+$("q").addEventListener("input", e => afficher(e.target.value));
+chargerDonnees();
+</script>
+</body>
+</html>

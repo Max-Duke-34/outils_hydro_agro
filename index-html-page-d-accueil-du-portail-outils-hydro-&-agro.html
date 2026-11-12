@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Outils hydro &amp; agro — calculateurs gratuits pour l'eau, les plantes et les sols</title>
+<meta name="description" content="Boîte à outils gratuite pour l'aménagement paysager et la gestion de l'eau : calculateur de doses d'irrigation, sélecteur de plantes selon vos critères, lexique botanique. Par Maxime Duquesne." />
+<style>
+  :root {
+    --green: #2e7d32; --green-dark: #1b5e20; --green-light: #e8f5e9;
+    --blue: #0277bd; --blue-light: #e1f5fe;
+    --ink: #1f2d27; --muted: #5f6f66; --bg: #f4f8f5; --card: #ffffff;
+    --border: #d8e3dc; --accent: #f9a825;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--ink); line-height: 1.5; }
+  header { background: linear-gradient(135deg, var(--green-dark), var(--green)); color: #fff; padding: 28px 16px 24px; text-align: center; }
+  .head { display: flex; align-items: center; gap: 16px; justify-content: space-between; flex-wrap: wrap; max-width: 900px; margin: 0 auto; }
+  .head .logo img { display: block; width: 84px; height: 84px; border-radius: 50%; background: #fff; }
+  .head .titles { flex: 1; text-align: center; min-width: 240px; }
+  header h1 { margin: 0 0 6px; font-size: 1.6rem; }
+  header p { margin: 0; opacity: .92; font-size: .95rem; }
+  .bmc { display: inline-block; background: #FFDD00; color: #111; font-weight: 700; font-size: .9rem; padding: 12px 18px; border-radius: 10px; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+  .bmc:hover { background: #ffeb4d; }
+  main { max-width: 900px; margin: 0 auto; padding: 26px 16px 60px; }
+  .intro { text-align: center; font-size: .95rem; color: var(--ink); max-width: 720px; margin: 0 auto 24px; }
+  .outils { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .outil { display: block; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 18px; text-decoration: none; color: var(--ink); transition: box-shadow .15s, transform .15s; }
+  .outil:hover { box-shadow: 0 4px 14px rgba(27,94,32,.15); transform: translateY(-2px); }
+  .outil .icone { font-size: 1.8rem; }
+  .outil h2 { margin: 8px 0 6px; font-size: 1.05rem; color: var(--green-dark); }
+  .outil p { margin: 0; font-size: .88rem; color: var(--muted); }
+  .outil.soon { opacity: .55; }
+  .outil.soon h2 { color: var(--muted); }
+  .badge { display: inline-block; background: var(--accent); color: #3e2723; font-size: .72rem; font-weight: 700; border-radius: 12px; padding: 2px 9px; vertical-align: middle; margin-left: 6px; }
+  .message { background: var(--blue-light); border-left: 4px solid var(--blue); padding: 10px 14px; border-radius: 6px; font-size: .88rem; margin: 26px 0 0; }
+  footer { text-align: center; font-size: .8rem; color: var(--muted); padding: 24px 16px 40px; }
+  footer a { color: var(--green); font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="logo"><img src="logo.png" alt="Logo Outils hydro &amp; agro" /></div>
+    <div class="titles">
+      <h1>💧 Outils hydro &amp; agro</h1>
+      <p>Des calculateurs gratuits pour arroser juste, choisir les bonnes plantes et parler botanique. Parce que bien doser l'eau n'a pas besoin d'être compliqué.</p>
+    </div>
+    <a class="bmc" href="https://www.buymeacoffee.com/Max_Duke" target="_blank" rel="noopener">☕ Soutenez mon travail</a>
+  </div>
+</header>
+<main>
+  <p class="intro">Pensés pour les professionnels des espaces verts, les étudiants en aménagement paysager et les jardiniers soucieux de la ressource en eau. Gratuits, sans inscription, utilisables sur terrain depuis un téléphone.</p>
+  <section class="outils">
+    <a class="outil" href="irrigation.html">
+      <div class="icone">💧</div>
+      <h2>Calculateur d'irrigation</h2>
+      <p>Plante, climat, sol, pente : obtenez les doses, durées et fréquences d'arrosage d'avril à septembre, et le coût de l'eau évitable.</p>
+    </a>
+    <a class="outil" href="plantes.html">
+      <div class="icone">🌱</div>
+      <h2>Sélecteur de plantes</h2>
+      <p>Indiquez votre contexte (sol, exposition, climat, floraison, usage) et découvrez les plantes de la base qui y répondent.</p>
+    </a>
+    <a class="outil" href="lexique.html">
+      <div class="icone">🌿</div>
+      <h2>Lexique botanique</h2>
+      <p>125 termes techniques expliqués pour le paysagiste, avec la planche illustrée des formes de feuilles.</p>
+    </a>
+    <div class="outil soon">
+      <div class="icone">🧪</div>
+      <h2>Triangle des textures <span class="badge">bientôt</span></h2>
+      <p>Situer un sol sur le triangle USDA et estimer sa réserve utile (RU).</p>
+    </div>
+    <div class="outil soon">
+      <div class="icone">🚰</div>
+      <h2>Pertes de charge <span class="badge">bientôt</span></h2>
+      <p>Choisir un diamètre de conduite d'irrigation selon le débit et estimer les pertes de charge linéaires.</p>
+    </div>
+  </section>
+  <p class="message">Un outil vous manque, une plante manque dans la base, une erreur à signaler ? Ces outils évoluent avec vos retours : écrivez-moi via la page contact ou soutenez le projet.</p>
+</main>
+<footer>
+  Outils développés par <strong>Maxime Duquesne</strong> — conseil et ingénierie en hydraulique (irrigation, espaces verts, eaux pluviales).<br>
+  Code sous licence MIT · Contenus sous licence CC BY 4.0 · <a href="mentions.html">Mentions légales</a>
+</footer>
+<!-- Mesure d'audience GoatCounter : sans cookie, sans donnée personnelle (voir mentions.html).
+     Remplacez "outils-hydro-agro" par votre identifiant GoatCounter. -->
+<script data-goatcounter="https://outils-hydro-agro.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
