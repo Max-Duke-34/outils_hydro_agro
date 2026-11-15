@@ -130,156 +130,43 @@
 
 <script>
 // ---------- DONNÉES (issues du classeur Excel arrosage-agro) ----------
+// Base plantes partagée avec le sélecteur (plante.csv, séparateur ;) :
+// colonnes Type / Latin / Nom / Kc / Enracinement (m)
 const TYPES = ["gazons et graminées","vivaces","grimpantes","succulentes","arbustes","arbres","palmiers"];
+let ESPECES = []; // [type, latin, nom français, Kc, profondeur racinaire (m)]
 
-// [type, nom latin, nom français, Kc, profondeur racinaire (m)]
-const ESPECES = [
-["gazons et graminées","Agrostis capillaris","Agrostide capillaire",0.8,0.1],
-["gazons et graminées","Agrostis palustris","Agrostide rampante",0.8,0.1],
-["gazons et graminées","Agrostis tenuis","Agrostide commune",0.8,0.1],
-["gazons et graminées","Cynodon spp.","Chiendent",0.6,0.1],
-["gazons et graminées","Festuca arundinacea","Fétuque élevée",0.8,0.1],
-["gazons et graminées","Festuca glauca","Fétuque bleue",0.2,0.15],
-["gazons et graminées","Festuca pratensis","Fétuque des prés",0.8,0.1],
-["gazons et graminées","Festuca rubra","Fétuque rouge",0.8,0.1],
-["gazons et graminées","Lolium multiflorum","Ray-grass d'Italie",0.8,0.1],
-["gazons et graminées","Lolium perenne","Ray-grass anglais",0.8,0.1],
-["gazons et graminées","Miscanthus sinensis","Roseau de Chine",0.8,0.2],
-["gazons et graminées","Paspalum vaginatum","Paspale",0.6,0.1],
-["gazons et graminées","Pennisetum clandestinum","Kikuyu",0.6,0.1],
-["gazons et graminées","Poa annua","Pâturin annuel",0.8,0.1],
-["gazons et graminées","Poa pratensis","Pâturin des prés",0.8,0.1],
-["gazons et graminées","Poa trivialis","Pâturin commun",0.8,0.1],
-["gazons et graminées","Stenotaphrum secundatum","Faux Kikuyu",0.6,0.1],
-["gazons et graminées","Stipa tenuissima","Cheveux d'ange",0.2,0.15],
-["gazons et graminées","Zoysia japonica","Zoysia du Japon",0.6,0.1],
-["vivaces","Agapanthus africanus","Agapanthe",0.5,0.3],
-["vivaces","Armeria maritima","Armérie maritime",0.5,0.3],
-["vivaces","Artemisia lanata","Armoise laineuse",0.2,0.3],
-["vivaces","Asphodeline lutea","Asphodèle jaune",0.2,0.3],
-["vivaces","Asteriscus maritimus","Astérisque maritime",0.5,0.3],
-["vivaces","Ballota pseudodictamnus","Ballote",0.1,0.3],
-["vivaces","Bulbinella frutescens","Bulbine",0.2,0.3],
-["vivaces","Centranthus ruber","Valériane",0.1,0.3],
-["vivaces","Ceratostigma plumbaginoides","Plumbago rampant",0.2,0.3],
-["vivaces","Cistus ladanifer","Ciste ladanifère",0.2,0.3],
-["vivaces","Cistus maritimus","Ciste maritime",0.2,0.3],
-["vivaces","Convolvulus mauritanicus","Liseron de Mauritanie",0.2,0.3],
-["vivaces","Dianthus corsicus","Œillet de Corse",0.5,0.3],
-["vivaces","Erigeron karvinskianus","Erigeron",0.2,0.3],
-["vivaces","Erysimum 'Bowles mauve'","Giroflée vivace",0.2,0.3],
-["vivaces","Euphorbia myrsinites","Euphorbe de Corse",0.2,0.3],
-["vivaces","Gaura lindheimeri","Gaura",0.5,0.3],
-["vivaces","Geranium sanguineum","Géranium sanguin",0.5,0.3],
-["vivaces","Iberis semperflorens","Ibéris",0.5,0.3],
-["vivaces","Justicia suberecta","Jacobine",0.5,0.3],
-["vivaces","Lavandula angustifolia","Lavande",0.2,0.3],
-["vivaces","Lavandula dentata","Lavande dentée",0.2,0.3],
-["vivaces","Lavandula x intermedia","Lavandin",0.2,0.3],
-["vivaces","Lavatera maritima","Lavatère maritime",0.2,0.3],
-["vivaces","Nepeta x faassenii","Herbe à chat",0.2,0.3],
-["vivaces","Oenothera drummondii","Œnothère à fleurs jaunes",0.2,0.3],
-["vivaces","Oenothera speciosa","Œnothère à fleurs roses",0.2,0.3],
-["vivaces","Origanum vulgare","Origan",0.5,0.3],
-["vivaces","Osteospermum ecklonis","Dimorphotéca",0.2,0.3],
-["vivaces","Othonnopsis cheirifolia","Othonne",0.2,0.3],
-["vivaces","Perovskia atriplicifolia","Sauge d'Afghanistan",0.5,0.3],
-["vivaces","Phyla nodiflora","Verveine nodiflore",0.2,0.3],
-["vivaces","Rosmarinus officinalis","Romarin",0.2,0.3],
-["vivaces","Salvia greggii","Sauge arbustive",0.2,0.3],
-["vivaces","Salvia officinalis","Sauge officinale",0.2,0.3],
-["vivaces","Santolina chamaecyparissus","Santoline",0.2,0.3],
-["vivaces","Saponaria ocymoides","Saponaire",0.2,0.3],
-["vivaces","Scabiosa cretica","Scabieuse",0.5,0.3],
-["vivaces","Sedum spectabile","Orpin d'automne",0.2,0.3],
-["vivaces","Senecio cineraria","Cinéraire maritime",0.2,0.3],
-["vivaces","Senecio greyi","Sénéçon",0.2,0.3],
-["vivaces","Teucrium cossonii","Teucrium de Majorque",0.1,0.3],
-["vivaces","Teucrium x lucidrys","Germandrée lucide",0.2,0.3],
-["vivaces","Thymus vulgaris","Thym",0.5,0.3],
-["vivaces","Tulbaghia violacea","Tulbaghia",0.5,0.3],
-["vivaces","Verbena bonariensis","Verveine de Buenos Aires",0.1,0.3],
-["vivaces","Verbena rigida","Verveine",0.2,0.3],
-["grimpantes","Bignonia capreolata","Bignone",0.5,0.4],
-["grimpantes","Campsis radicans","Bignone",0.2,0.4],
-["grimpantes","Clematis armandii","Clématite d'Armand",0.5,0.4],
-["grimpantes","Ipomoea learii","Ipomée",0.2,0.4],
-["grimpantes","Jasminum mesnyi","Jasmin primevère",0.2,0.4],
-["grimpantes","Jasminum officinale","Jasmin officinal",0.2,0.4],
-["grimpantes","Lonicera japonica","Chèvrefeuille du Japon",0.5,0.4],
-["grimpantes","Macfadyena unguis-cati","Griffe de chat",0.2,0.4],
-["grimpantes","Plumbago capensis","Plumbago du Cap",0.2,0.4],
-["grimpantes","Rosa banksiae","Rosier banks",0.2,0.4],
-["grimpantes","Solanum jasminoides","Solanum",0.5,0.4],
-["grimpantes","Trachelospermum jasminoides","Jasmin de Chine",0.5,0.4],
-["grimpantes","Vitis vinifera","Vigne",0.2,0.4],
-["grimpantes","Wisteria sinensis","Glycine",0.5,0.4],
-["succulentes","Agave americana","Agave américaine",0.2,0.45],
-["succulentes","Dasylirion glaucophyllum","Dasylirion à feuilles glauques",0.1,0.45],
-["succulentes","Opuntia spp.","Figuier de Barbarie",0.1,0.45],
-["succulentes","Yucca gloriosa","Yucca superbe",0.2,0.45],
-["succulentes","Yucca rostrata","Yucca rostré",0.2,0.45],
-["arbustes","Abelia x grandiflora","Abélia à grandes fleurs",0.5,0.4],
-["arbustes","Artemisia arborescens","Armoise arborescente",0.1,0.4],
-["arbustes","Atriplex halimus","Blanquette",0.1,0.4],
-["arbustes","Buxus sempervirens","Buis commun",0.5,0.4],
-["arbustes","Choisya ternata","Oranger du Mexique",0.5,0.4],
-["arbustes","Cistus albidus","Ciste cotonneux",0.2,0.4],
-["arbustes","Cistus monspeliensis","Ciste de Montpellier",0.2,0.4],
-["arbustes","Cistus salviifolius","Ciste à feuilles de sauge",0.2,0.4],
-["arbustes","Cistus x pulverulentus","Ciste",0.2,0.4],
-["arbustes","Cistus x purpureus","Ciste pourpre",0.2,0.4],
-["arbustes","Cistus x skanbergii","Ciste rose",0.2,0.4],
-["arbustes","Convolvulus cneorum","Liseron arbustif",0.2,0.4],
-["arbustes","Cotinus coggygria","Arbre à perruque",0.2,0.4],
-["arbustes","Dorycnium hirsutum","Dorycnie hirsute",0.2,0.4],
-["arbustes","Elaeagnus x ebbingei","Chalef",0.2,0.4],
-["arbustes","Escallonia rubra","Escallonia rouge",0.5,0.4],
-["arbustes","Euphorbia characias","Euphorbe de Méditerranée",0.2,0.4],
-["arbustes","Hypericum 'Hidcote'","Millepertuis arbustif",0.5,0.4],
-["arbustes","Myrtus communis","Myrte",0.2,0.4],
-["arbustes","Nerium oleander","Laurier rose",0.2,0.4],
-["arbustes","Phlomis fruticosa","Sauge de Jérusalem",0.2,0.4],
-["arbustes","Phlomis purpurea","Sauge de Jérusalem pourpre",0.2,0.4],
-["arbustes","Photinia x fraseri","Photinia",0.5,0.4],
-["arbustes","Pistacia terebinthus","Pistachier térébinthe",0.2,0.4],
-["arbustes","Pistacia lentiscus","Pistachier lentisque",0.1,0.4],
-["arbustes","Pittosporum tobira","Pittospore",0.2,0.4],
-["arbustes","Punica granatum","Grenadier",0.2,0.4],
-["arbustes","Rhamnus alaternus","Alaterne",0.2,0.4],
-["arbustes","Rosa chinensis 'Mutabilis'","Rosier de Chine",0.2,0.4],
-["arbustes","Teucrium fruticans","Germandrée frutescente",0.2,0.4],
-["arbustes","Viburnum tinus","Laurier tin",0.5,0.4],
-["arbustes","Vitex agnus-castus","Gattilier",0.2,0.4],
-["arbres","Acacia melanoxylon","Mimosa",0.1,0.55],
-["arbres","Acer campestre","Érable champêtre",0.5,0.55],
-["arbres","Alnus cordata","Aulne de Corse",0.5,0.55],
-["arbres","Celtis australis","Micocoulier",0.2,0.55],
-["arbres","Cercis siliquastrum","Arbre de Judée",0.5,0.55],
-["arbres","Crataegus monogyna","Aubépine",0.5,0.55],
-["arbres","Elaeagnus angustifolia","Olivier de Bohême",0.2,0.55],
-["arbres","Fraxinus ornus","Frêne à fleurs",0.5,0.55],
-["arbres","Gleditsia triacanthos","Févier d'Amérique",0.2,0.55],
-["arbres","Koelreuteria paniculata","Savonnier",0.5,0.55],
-["arbres","Laurus nobilis","Laurier sauce",0.2,0.55],
-["arbres","Ligustrum japonicum","Troène du Japon",0.5,0.55],
-["arbres","Melia azedarach","Lilas de Perse",0.1,0.55],
-["arbres","Morus alba","Mûrier blanc",0.5,0.55],
-["arbres","Olea europaea","Olivier",0.1,0.55],
-["arbres","Pinus halepensis","Pin d'Alep",0.2,0.55],
-["arbres","Pinus pinea","Pin parasol",0.2,0.55],
-["arbres","Platanus x acerifolia","Platane",0.5,0.55],
-["arbres","Populus alba","Peuplier blanc",0.5,0.55],
-["arbres","Pyrus calleryana","Poirier pyramidal",0.5,0.55],
-["arbres","Quercus ilex","Chêne vert",0.2,0.55],
-["arbres","Schinus molle","Faux poivrier",0.1,0.55],
-["arbres","Sophora japonica","Sophora",0.2,0.55],
-["arbres","Tamarix ramosissima","Tamaris d'été",0.1,0.55],
-["arbres","Tamarix tetrandra","Tamaris printanier",0.1,0.55],
-["arbres","Tilia tomentosa","Tilleul argenté",0.5,0.55],
-["palmiers","Chamaerops humilis","Palmier nain",0.2,0.55],
-["palmiers","Trachycarpus fortunei","Palmier de Chine",0.2,0.55]
-];
+function parseCSV(text) {
+  const lignes = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim() !== "");
+  const entetes = lignes[0].split(";");
+  return lignes.slice(1).map(l => {
+    const cellules = []; let cur = ""; let q = false;
+    for (let i = 0; i < l.length; i++) {
+      const c = l[i];
+      if (q) { if (c === '"') { if (l[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === ";") { cellules.push(cur); cur = ""; }
+      else cur += c;
+    }
+    cellules.push(cur);
+    const o = {};
+    entetes.forEach((h, i) => o[h] = (cellules[i] || "").trim());
+    return o;
+  });
+}
+const num = v => { const f = parseFloat((v || "").replace(",", ".")); return isNaN(f) ? null : f; };
+
+function chargerEspeces() {
+  return fetch("plante.csv")
+    .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+    .then(txt => {
+      ESPECES = parseCSV(txt)
+        .filter(o => TYPES.includes(o["Type"]) && o["Kc"] !== "" && o["Enracinement (m)"] !== "")
+        .map(o => [o["Type"], o["Latin"], o["Nom"], num(o["Kc"]), num(o["Enracinement (m)"])]);
+    })
+    .catch(() => {
+      $("resultats").innerHTML = '<p class="noresult" style="text-align:center;color:var(--muted);padding:20px">⚠ Plantes non chargées : le fichier <code>plante.csv</code> doit se trouver dans le même dossier que la page (voir le dépôt GitHub).</p>';
+    });
+}
 
 // [nom, RU sur 1 m (mm), perméabilités mm/h par classe de pente]
 const SOLS = [
@@ -387,7 +274,9 @@ function majEspeces() {
 }
 
 function rendre() {
+  if (!ESPECES.length) return;
   const espece = ESPECES.find(e => e[1] === $("espece").value) || ESPECES.find(e => e[0]===$("type").value);
+  if (!espece) return;
   const ageCoef = parseFloat($("age").value);
   const sol = SOLS.find(s => s[0] === $("sol").value);
   const idxPente = parseInt($("pente").value);
@@ -449,8 +338,7 @@ function rendre() {
 document.addEventListener("input", rendre);
 document.addEventListener("change", rendre);
 $("type").addEventListener("change", majEspeces);
-initSelects();
-rendre();
+chargerEspeces().then(() => { initSelects(); rendre(); });
 </script>
 <!-- Mesure d'audience GoatCounter : sans cookie, sans donnée personnelle (voir mentions.html). -->
 <script data-goatcounter="https://mx-dk.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
