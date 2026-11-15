@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Choisir une plante — Outils hydro &amp; agro</title>
-<meta name="description" content="Sélecteur de plantes pour espaces verts : trouvez la plante adaptée à votre contexte (sol, exposition, climat, hauteur, floraison, usage) parmi une base de 100 plantes de référence." />
+<meta name="description" content="Sélecteur de plantes pour espaces verts : trouvez la plante adaptée à votre contexte (type, exposition, climat, pH, hauteur, floraison, Kc d'irrigation) parmi une base de référence partagée avec le calculateur d'irrigation." />
 <style>
   :root {
     --green: #2e7d32; --green-dark: #1b5e20; --green-light: #e8f5e9;
@@ -28,6 +28,9 @@
   .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
   label { display: block; font-size: .8rem; color: var(--muted); margin: 0 0 4px; font-weight: 600; }
   select, input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; font-size: .9rem; color: var(--ink); }
+  .checks { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+  .checks label { display: flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--ink); margin: 0; cursor: pointer; }
+  .checks input { width: auto; }
   .actions { margin-top: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   button { background: var(--green); color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; font-size: .9rem; font-weight: 600; cursor: pointer; }
   button:hover { background: var(--green-dark); }
@@ -38,6 +41,9 @@
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
   .chip { background: var(--green-light); color: var(--green-dark); border-radius: 20px; padding: 3px 10px; font-size: .8rem; font-weight: 600; }
   .chip.bleu { background: #e1f5fe; color: #0277bd; }
+  .chip.warn { background: #fff3e0; color: #e65100; }
+  .planteflex { display: flex; gap: 14px; flex-wrap: wrap; }
+  .planteflex img.photo { width: 130px; height: 130px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); align-self: flex-start; }
   .kv { font-size: .88rem; margin: 4px 0; }
   .kv b { color: var(--green-dark); }
   .liens { margin-top: 8px; font-size: .85rem; }
@@ -53,7 +59,7 @@
     <div class="logo"><img src="logo.png" alt="Logo Outils hydro &amp; agro" /></div>
     <div class="titles">
       <h1>🌱 Sélecteur de plantes</h1>
-      <p>Indiquez votre contexte (sol, exposition, climat, hauteur, floraison, usage) : l'outil liste les plantes de la base qui y répondent. Pensé pour l'aménagement paysager et la construction d'une culture végétale.</p>
+      <p>Indiquez votre contexte (type, exposition, climat, pH, hauteur, floraison, besoin en eau) : l'outil liste les plantes de la base qui y répondent. La base est partagée avec le calculateur d'irrigation.</p>
     </div>
     <a class="bmc" href="https://www.buymeacoffee.com/Max_Duke" target="_blank" rel="noopener">☕ Soutenez mon travail</a>
   </div>
@@ -71,43 +77,40 @@
         <select id="f-type"><option value="">— tous —</option></select>
       </div>
       <div>
-        <label for="f-feuil">Feuillage</label>
-        <select id="f-feuil"><option value="">— tous —</option></select>
-      </div>
-      <div>
         <label for="f-expo">Exposition</label>
         <select id="f-expo"><option value="">— toutes —</option></select>
-      </div>
-      <div>
-        <label for="f-sol">Type de sol</label>
-        <select id="f-sol"><option value="">— tous —</option></select>
-      </div>
-      <div>
-        <label for="f-ph">Nature du sol (pH)</label>
-        <select id="f-ph"><option value="">— tous —</option></select>
       </div>
       <div>
         <label for="f-clim">Climat</label>
         <select id="f-clim"><option value="">— tous —</option></select>
       </div>
       <div>
-        <label for="f-crois">Croissance</label>
-        <select id="f-crois"><option value="">— toutes —</option></select>
+        <label for="f-ph">Nature du sol (pH)</label>
+        <select id="f-ph"><option value="">— tous —</option></select>
       </div>
       <div>
-        <label for="f-mois">En fleur en…</label>
-        <select id="f-mois"><option value="">— tout l'année —</option></select>
+        <label for="f-saison">En fleur en…</label>
+        <select id="f-saison"><option value="">— toute l'année —</option></select>
       </div>
       <div>
         <label for="f-hmax">Hauteur max (m)</label>
         <input type="number" id="f-hmax" min="0" step="0.1" placeholder="ex. 3" />
       </div>
+      <div>
+        <label for="f-kcmax">Kc max (besoin en eau)</label>
+        <input type="number" id="f-kcmax" min="0" max="1" step="0.1" placeholder="ex. 0.3" />
+      </div>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox" id="c-nonTox" /> Non toxique seulement</label>
+      <label><input type="checkbox" id="c-arom" /> Aromatique</label>
+      <label><input type="checkbox" id="c-comest" /> Comestible</label>
     </div>
     <div class="actions"><button id="reset">Réinitialiser les critères</button></div>
   </section>
   <p class="count" id="count"></p>
   <div id="liste"></div>
-  <p class="hint" style="font-size:.82rem;color:var(--muted);margin-top:18px">NB : les plantes incomplètes dans la base n'apparaissent que si le critère manquant n'est pas actif. La base est mise à jour via le fichier <code>plante.csv</code> du dépôt.</p>
+  <p class="hint" style="font-size:.82rem;color:var(--muted);margin-top:18px">Kc = coefficient cultural (0,1 plante sobre → 0,8 plante très exigeante en eau) · Enracinement = profondeur de sol exploitable pour l'arrosage. Une fiche sans Kc n'est pas encore reliée au calculateur d'irrigation. La base est mise à jour via le fichier <code>plante.csv</code> du dépôt.</p>
 </main>
 <footer>
   Base végétale « info bota », outil pédagogique développé par <strong>Maxime Duquesne</strong>.<br>
@@ -118,8 +121,9 @@
 // ---------- Chargement des données (plante.csv, séparateur ;) ----------
 let PLANTES = [];
 const $ = id => document.getElementById(id);
-const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
 const sansAccent = s => (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const TYPES = ["gazons et graminées","vivaces","grimpantes","succulentes","arbustes","arbres","palmiers"];
+const SAISONS = ["hiver","printemps","été","automne"];
 
 function parseCSV(text) {
   const lignes = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim() !== "");
@@ -140,22 +144,20 @@ function parseCSV(text) {
   });
 }
 const num = v => { const s = (v || "").replace(",", "."); const f = parseFloat(s); return isNaN(f) ? null : f; };
-const moisNum = v => { const s = sansAccent((v||"").toLowerCase()); const i = MOIS.findIndex(m => sansAccent(m) === s); return i === -1 ? null : i + 1; };
 
 function chargerDonnees() {
   return fetch("plante.csv")
     .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
     .then(txt => {
       PLANTES = parseCSV(txt).map(o => ({
-        nom: o["Nom"], latin: o["Latin"], cultivar: o["Cultivar"], famille: o["Famille"],
-        type: o["Type"] || null, feuillage: o["Feuillage"] || null, croissance: o["Croissance"] || null,
+        nom: o["Nom"], latin: o["Latin"], famille: o["Famille"] || null, type: o["Type"] || null,
         hauteur: num(o["Hauteur (m)"]), largeur: num(o["Largeur (m)"]), port: o["Port"] || null,
-        floDebut: moisNum(o["Début floraison"]), floFin: moisNum(o["Fin floraison"]), floType: o["Type floraison"],
-        sol: o["Type de sol"] || null, ph: o["pH"] || null, climat: o["Climat"] || null,
         expoIdeale: o["Exposition idéale"] || null, expoAcceptee: o["Exposition acceptée"] || null,
-        arrosage: o["Arrosage"] || null, remarque: o["Remarque"], tracant: o["Traçant"] || null,
-        rusticite: num(o["Rusticité (°C)"]), util1: o["Utilisation 1"], util2: o["Utilisation 2"],
-        infos: o["Infos"], wiki: o["Fiche wiki"], photo: o["Photos"]
+        climat: o["Climat"] || null, kc: num(o["Kc"]), racines: num(o["Enracinement (m)"]),
+        ph: o["pH"] || null, saison: o["Saison floraison"] || null, couleur: o["Couleur floraison"] || null,
+        toxique: o["Toxique"] === "oui", aromatique: o["Aromatique"] === "oui", comestible: o["Comestible"] === "oui",
+        rusticite: num(o["Rusticité (°C)"]), commentaire: o["Commentaire"] || null,
+        wiki: o["Fiche wiki"] || null, photo: o["Photo"] || null
       })).filter(p => p.nom);
       init();
     })
@@ -173,22 +175,15 @@ function distinctes(prop) {
   return [...new Set(PLANTES.map(p => p[prop]).filter(Boolean))].sort((a,b) => a.localeCompare(b,"fr"));
 }
 function init() {
-  remplirSelect("f-type", distinctes("type"));
-  remplirSelect("f-feuil", distinctes("feuillage"));
-  remplirSelect("f-sol", distinctes("sol"));
-  remplirSelect("f-ph", distinctes("ph"));
+  remplirSelect("f-type", TYPES);
   remplirSelect("f-clim", distinctes("climat"));
-  remplirSelect("f-crois", distinctes("croissance"));
+  remplirSelect("f-ph", distinctes("ph"));
   $("f-expo").innerHTML = '<option value="">—</option><option value="plein soleil">plein soleil</option><option value="mi ombre">mi ombre</option>';
-  $("f-mois").innerHTML = '<option value="">—</option>' + MOIS.map((m,i) => `<option value="${i+1}">${m[0].toUpperCase()+m.slice(1)}</option>`).join("");
+  $("f-saison").innerHTML = '<option value="">—</option>' + SAISONS.map(s => `<option value="${s}">${s[0].toUpperCase()+s.slice(1)}</option>`).join("");
   filtrer();
 }
 
-function fleuriEn(p, mois) {
-  if (!p.floDebut || !p.floFin) return false;
-  if (p.floDebut <= p.floFin) return mois >= p.floDebut && mois <= p.floFin;
-  return mois >= p.floDebut || mois <= p.floFin;
-}
+function saisonOk(p, s) { return p.saison && sansAccent(p.saison.toLowerCase()).includes(s); }
 function expoOk(p, v) {
   return (p.expoIdeale && p.expoIdeale.includes(v)) || (p.expoAcceptee && p.expoAcceptee.includes(v));
 }
@@ -197,22 +192,24 @@ function filtrer() {
   if (!PLANTES.length) return;
   const q = sansAccent($("q").value.trim().toLowerCase());
   const c = {
-    type: $("f-type").value, feuillage: $("f-feuil").value, expo: $("f-expo").value,
-    sol: $("f-sol").value, ph: $("f-ph").value, climat: $("f-clim").value,
-    croissance: $("f-crois").value, mois: parseInt($("f-mois").value) || null,
-    hmax: parseFloat($("f-hmax").value) || null
+    type: $("f-type").value, expo: $("f-expo").value, climat: $("f-clim").value,
+    ph: $("f-ph").value, saison: sansAccent($("f-saison").value.toLowerCase()),
+    hmax: parseFloat($("f-hmax").value.replace(",", ".")) || null,
+    kcmax: parseFloat($("f-kcmax").value.replace(",", ".")) || null,
+    nonTox: $("c-nonTox").checked, arom: $("c-arom").checked, comest: $("c-comest").checked
   };
   const res = PLANTES.filter(p => {
-    if (q && !sansAccent((p.nom+" "+p.latin+" "+p.famille+" "+p.util1+" "+p.util2).toLowerCase()).includes(q)) return false;
+    if (q && !sansAccent((p.nom+" "+p.latin+" "+(p.famille||"")).toLowerCase()).includes(q)) return false;
     if (c.type && p.type !== c.type) return false;
-    if (c.feuillage && p.feuillage !== c.feuillage) return false;
     if (c.expo && !expoOk(p, c.expo)) return false;
-    if (c.sol && p.sol !== c.sol) return false;
-    if (c.ph && p.ph !== c.ph) return false;
     if (c.climat && p.climat !== c.climat) return false;
-    if (c.croissance && p.croissance !== c.croissance) return false;
-    if (c.mois && !fleuriEn(p, c.mois)) return false;
+    if (c.ph && (p.ph || "").toLowerCase() !== c.ph.toLowerCase()) return false;
+    if (c.saison && !saisonOk(p, c.saison)) return false;
     if (c.hmax !== null && (p.hauteur === null || p.hauteur > c.hmax)) return false;
+    if (c.kcmax !== null && (p.kc === null || p.kc > c.kcmax)) return false;
+    if (c.nonTox && p.toxique) return false;
+    if (c.arom && !p.aromatique) return false;
+    if (c.comest && !p.comestible) return false;
     return true;
   }).sort((a,b) => sansAccent(a.nom).localeCompare(sansAccent(b.nom),"fr"));
 
@@ -220,27 +217,28 @@ function filtrer() {
   $("liste").innerHTML = res.length ? res.map(p => `
     <article class="plante">
       <h3>${p.nom}</h3>
-      <div class="latin">${p.latin}${p.cultivar ? " '" + p.cultivar + "'" : ""}</div>
+      <div class="latin">${p.latin}</div>
       <div class="chips">
         ${p.famille ? `<span class="chip bleu">${p.famille}</span>` : ""}
         ${p.type ? `<span class="chip">${p.type}</span>` : ""}
-        ${p.feuillage ? `<span class="chip">${p.feuillage}</span>` : ""}
-        ${p.climat ? `<span class="chip">climat ${p.climat}</span>` : ""}
-        ${p.tracant ? `<span class="chip">${p.tracant}</span>` : ""}
+        ${p.comestible ? `<span class="chip">comestible</span>` : ""}
+        ${p.aromatique ? `<span class="chip">aromatique</span>` : ""}
+        ${p.toxique ? `<span class="chip warn">⚠ toxique</span>` : ""}
       </div>
-      ${p.hauteur !== null ? `<p class="kv"><b>Taille :</b> ${p.hauteur} m de haut${p.largeur !== null ? " × " + p.largeur + " m de large" : ""}${p.port ? ", port " + p.port : ""}</p>` : ""}
-      ${(p.sol || p.ph) ? `<p class="kv"><b>Sol :</b> ${p.sol || "—"}${p.ph ? " · " + p.ph : ""}</p>` : ""}
-      ${p.expoIdeale ? `<p class="kv"><b>Exposition :</b> ${p.expoIdeale}${p.expoAcceptee ? " (accepte : " + p.expoAcceptee + ")" : ""}</p>` : ""}
-      ${p.floDebut ? `<p class="kv"><b>Floraison :</b> ${MOIS[p.floDebut-1]} → ${MOIS[p.floFin-1]}${p.floType ? " · " + p.floType : ""}</p>` : ""}
-      ${p.croissance ? `<p class="kv"><b>Croissance :</b> ${p.croissance}</p>` : ""}
-      ${p.arrosage ? `<p class="kv"><b>Arrosage :</b> ${p.arrosage === "non" ? "non nécessaire (rustique)" : p.arrosage}</p>` : ""}
-      ${p.rusticite !== null ? `<p class="kv"><b>Rusticité :</b> jusqu'à ${p.rusticite} °C</p>` : ""}
-      ${(p.util1 || p.util2) ? `<p class="kv"><b>Utilisation :</b> ${[p.util1, p.util2].filter(Boolean).join(", ")}</p>` : ""}
-      ${p.remarque ? `<p class="kv"><b>À noter :</b> ${p.remarque}</p>` : ""}
-      ${p.infos ? `<p class="kv"><b>Info :</b> ${p.infos}</p>` : ""}
-      <div class="liens">
-        ${p.wiki ? `<a href="${p.wiki}" target="_blank" rel="noopener">📖 Fiche (wiki)</a>` : ""}
-        ${p.photo ? `<a href="${p.photo}" target="_blank" rel="noopener">🖼 Photos</a>` : ""}
+      <div class="planteflex">
+        ${p.photo ? `<img class="photo" src="${p.photo}" alt="${p.nom}" loading="lazy" onerror="this.remove()" />` : ""}
+        <div>
+          ${p.hauteur !== null ? `<p class="kv"><b>Taille indicative :</b> ${p.hauteur} m de haut${p.largeur !== null ? " × " + p.largeur + " m de large" : ""}${p.port ? ", port " + p.port : ""}</p>` : ""}
+          ${(p.expoIdeale || p.climat) ? `<p class="kv"><b>Exposition / climat :</b> ${[p.expoIdeale ? p.expoIdeale + (p.expoAcceptee ? " (accepte : " + p.expoAcceptee + ")" : "") : null, p.climat ? "climat " + p.climat : null].filter(Boolean).join(" · ")}</p>` : ""}
+          <p class="kv"><b>pH :</b> ${p.ph || "indifférent"}</p>
+          ${(p.saison || p.couleur) ? `<p class="kv"><b>Floraison :</b> ${[p.saison, p.couleur].filter(Boolean).join(" · ")}</p>` : ""}
+          ${p.kc !== null ? `<p class="kv"><b>Besoin en eau :</b> Kc ${p.kc.toLocaleString("fr-FR")}${p.racines !== null ? " · enracinement " + p.racines.toLocaleString("fr-FR") + " m" : ""} — <a href="irrigation.html" style="color:var(--green);font-weight:600">calculer l'arrosage</a></p>` : ""}
+          ${p.rusticite !== null ? `<p class="kv"><b>Rusticité :</b> jusqu'à ${p.rusticite} °C</p>` : ""}
+          ${p.commentaire ? `<p class="kv"><b>À noter :</b> ${p.commentaire}</p>` : ""}
+          <div class="liens">
+            ${p.wiki ? `<a href="${p.wiki}" target="_blank" rel="noopener">📖 Fiche (wiki)</a>` : ""}
+          </div>
+        </div>
       </div>
     </article>`).join("")
     : `<p class="noresult">Aucune plante de la base ne répond à tous ces critères. Essayez d'en retirer un ou deux.</p>`;
@@ -248,7 +246,8 @@ function filtrer() {
 document.addEventListener("input", filtrer);
 document.addEventListener("change", filtrer);
 $("reset").addEventListener("click", () => {
-  ["q","f-type","f-feuil","f-expo","f-sol","f-ph","f-clim","f-crois","f-mois","f-hmax"].forEach(id => $(id).value = "");
+  ["q","f-type","f-expo","f-clim","f-ph","f-saison","f-hmax","f-kcmax"].forEach(id => $(id).value = "");
+  ["c-nonTox","c-arom","c-comest"].forEach(id => $(id).checked = false);
   filtrer();
 });
 chargerDonnees();
