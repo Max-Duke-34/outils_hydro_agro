@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triangle des textures &amp; réserve utile (RU)</title>
+<meta name="description" content="Situez votre sol sur le triangle des textures et estimez sa réserve utile (RU) à partir de 10 formules publiées, avec valeur moyenne et marge d'incertitude.">
+<style>
+  :root{
+    --vert:#2e7d32; --vert-clair:#e8f5e9; --bleu:#1565c0; --gris:#f4f6f8;
+    --bord:#d5dbe1; --txt:#1f2a30; --accent:#f57f17;
+  }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:0;color:var(--txt);background:#fbfcfd;line-height:1.45}
+  header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#fff;border-bottom:1px solid var(--bord);flex-wrap:wrap;gap:8px}
+  header .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt);font-weight:600}
+  header img{height:40px;width:40px;border-radius:50%;object-fit:cover}
+  .bmc{display:inline-block;background:#ff9b02;border:1px solid #e63946;color:#fff;text-decoration:none;font-weight:600;padding:8px 14px;border-radius:20px;font-size:.9em}
+  main{max-width:1060px;margin:0 auto;padding:16px}
+  h1{font-size:1.5em;margin:14px 0 4px}
+  h2{font-size:1.1em;margin:26px 0 10px;color:var(--vert);border-bottom:2px solid var(--vert-clair);padding-bottom:4px}
+  .intro{color:#54646e;font-size:.95em;margin:4px 0 8px}
+  .card{background:#fff;border:1px solid var(--bord);border-radius:10px;padding:16px;margin:12px 0}
+  .grille{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  label{display:block;font-size:.85em;color:#54646e;margin-bottom:3px;font-weight:600}
+  input,select{width:100%;padding:8px;border:1px solid var(--bord);border-radius:6px;font-size:1em;background:#fff}
+  input:focus,select:focus{outline:2px solid var(--vert-clair);border-color:var(--vert)}
+  .aide{font-size:.78em;color:#7a8a94;margin-top:3px}
+  .invisible{display:none}
+  .recap{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;font-size:.9em}
+  .badge{background:var(--vert-clair);color:var(--vert);border-radius:14px;padding:4px 10px}
+  table{width:100%;border-collapse:collapse;font-size:.92em}
+  th,td{padding:8px 8px;border-bottom:1px solid var(--bord);text-align:left}
+  th{background:var(--gris);font-size:.85em;text-transform:uppercase;letter-spacing:.03em}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .resume{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+  .kpis{background:var(--vert-clair);border:1px solid #c8e6c9;border-radius:10px;padding:12px;text-align:center}
+  .kpis .v{font-size:1.5em;font-weight:700;color:var(--vert)}
+  .kpis .l{font-size:.8em;color:#3d6b41}
+  .kpis .s{font-size:.75em;color:#5a7d5e}
+  .kpis .t{font-size:1.12em;font-weight:800;color:var(--vert);line-height:1.3}
+  .kpis .tt{font-size:.95em;font-weight:800;color:#3d6b41}
+  .kpis .st{font-size:.75em;color:#5a7d5e}
+  .kpis .v2{font-size:1.5em;font-weight:800;color:#1f2a30;line-height:1.2}
+  .kpis .v3{font-size:1.05em;font-weight:800;color:#1f2a30;line-height:1.5}
+  .excl{font-size:.85em;color:#7a8a94;margin-top:8px}
+  .avert{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:10px;font-size:.85em;margin:10px 0}
+  .ok{color:var(--vert);font-weight:600}
+  .ko{color:#b26a00}
+  .triangle-wrap{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+  .triangle-wrap svg{max-width:420px;width:100%;height:auto;flex:1 1 320px}
+  .sources{font-size:.82em;color:#54646e}
+  .sources li{margin-bottom:6px}
+  footer{max-width:1060px;margin:0 auto;padding:16px;text-align:center;font-size:.85em;color:#7a8a94}
+  footer a{color:var(--bleu)}
+  @media (max-width:560px){ th,td{padding:6px 4px;font-size:.85em} }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <img src="logo.png" alt="" onerror="this.style.display='none';document.getElementById('logoTxt').style.display='inline'">
+    <span id="logoTxt" style="display:none">Outils hydro &amp; agro</span>
+  </a>
+  <a class="bmc" href="https://www.buymeacoffee.com/Max_Duke" target="_blank" rel="noopener">☕ Offrez-moi un café</a>
+</header>
+
+<main>
+<h1>Triangle des textures &amp; estimation de la réserve utile (RU)</h1>
+<p class="intro">Saisissez les données dont vous disposez&nbsp;: plus elles sont complètes, plus la RU est estimée par un nombre élevé de formules indépendantes. Le résultat affiche la <strong>valeur moyenne</strong> et la <strong>marge d'incertitude</strong> (écart entre formules), pas une précision illusoire.</p>
+
+<h2>1. Granulométrie</h2>
+<div class="card">
+  <label>Grille de saisie</label>
+  <select id="grille" onchange="majGrille()">
+    <option value="usda">Totaux USDA — argile / limon / sable (le 3ᵉ est calculé automatiquement)</option>
+    <option value="fr">Grille française (AFES) — argile, limons fins &amp; grossiers, sables fins &amp; grossiers</option>
+  </select>
+
+  <div class="grille" id="saisieUsda" style="margin-top:12px">
+    <div><label for="argile">Argile (&lt; 2 µm), %</label><input id="argile" type="number" step="0.1" min="0" max="100" inputmode="decimal" placeholder="ex. 18,5"></div>
+    <div><label for="limon">Limon (2 – 50 µm), %</label><input id="limon" type="number" step="0.1" min="0" max="100" inputmode="decimal" placeholder="ex. 45"></div>
+    <div><label for="sable">Sable (50 µm – 2 mm), %</label><input id="sable" type="number" step="0.1" min="0" max="100" inputmode="decimal" placeholder="calculé"></div>
+  </div>
+
+  <div class="grille invisible" id="saisieFr" style="margin-top:12px">
+    <div><label for="argileF">Argile (&lt; 2 µm), %</label><input id="argileF" type="number" step="0.1" min="0" max="100" inputmode="decimal"></div>
+    <div><label for="lf">Limon fin (2 – 20 µm), %</label><input id="lf" type="number" step="0.1" min="0" max="100" inputmode="decimal"></div>
+    <div><label for="lg">Limon grossier (20 – 50 µm), %</label><input id="lg" type="number" step="0.1" min="0" max="100" inputmode="decimal"></div>
+    <div><label for="sf">Sable fin (50 – 200 µm), %</label><input id="sf" type="number" step="0.1" min="0" max="100" inputmode="decimal"></div>
+    <div><label for="sg">Sable grossier (0,2 – 2 mm), %</label><input id="sg" type="number" step="0.1" min="0" max="100" inputmode="decimal"></div>
+    <p class="aide" style="grid-column:1/-1">Les totaux USDA (argile / limon / sable) sont recalculés à partir des 5 fractions. À ce jour, aucune des formules de RU publiées ici ne distingue fins et grossiers&nbsp;: cette grille sert surtout à saisir proprement un bulletin d'analyse français.</p>
+  </div>
+
+  <div class="grille" style="margin-top:14px">
+    <div><label for="mo">Matière organique, % <span class="aide">(optionnel)</span></label><input id="mo" type="number" step="0.1" min="0" max="60" inputmode="decimal" placeholder="ex. 2,5"></div>
+    <div><label for="da">Densité apparente, g/cm³ <span class="aide">(optionnel)</span></label><input id="da" type="number" step="0.01" min="0.5" max="2" inputmode="decimal" placeholder="ex. 1,35"></div>
+  </div>
+  <p class="aide">Sans MO ni densité apparente, seules les formules « texture seule » s'appliquent (3 à 4 formules). Renseignées, elles activent jusqu'à 10 formules.</p>
+</div>
+
+<h2>2. Horizon étudié</h2>
+<div class="card">
+  <div class="grille">
+    <div><label for="epaisseur">Épaisseur de l'horizon, cm</label><input id="epaisseur" type="number" step="1" min="1" max="400" value="30" inputmode="numeric"></div>
+    <div><label for="pierrosite">Pierrosité (éléments &gt; 2 mm), % du volume</label><input id="pierrosite" type="number" step="1" min="0" max="90" value="0" inputmode="numeric"></div>
+    <div><label for="natureCailloux">Nature des cailloux <span class="aide">(si pierrosité &gt; 0)</span></label>
+      <select id="natureCailloux">
+        <option value="0">— ignorer la rétention des cailloux —</option>
+        <option value="0.2">Silex</option>
+        <option value="0.5">Granite</option>
+        <option value="0.9">Calcaire</option>
+        <option value="1.2">Schiste</option>
+        <option value="2.2">Craie</option>
+      </select>
+    </div>
+    <div><label for="typeHorizon">Type d'horizon <span class="aide">(pour la table de Bruand)</span></label>
+      <select id="typeHorizon">
+        <option value="surface">Horizon de surface (A)</option>
+        <option value="profond">Horizon profond (E, B, C)</option>
+      </select>
+    </div>
+  </div>
+  <p class="aide">La RU est estimée pour l'horizon renseigné. Les cailloux retiennent peu d'eau utile&nbsp;: leur contribution n'est comptée que si vous en précisez la nature (valeurs Arvalis / INRAE).</p>
+</div>
+
+<h2>3. Résultats</h2>
+<div class="card">
+  <div class="triangle-wrap">
+    <div style="flex:1 1 300px;min-width:260px">
+    <svg viewBox="0 0 440 400" role="img" aria-label="Triangle des textures USDA">
+      <polygon points="40,360 400,360 220,48.6" fill="#f7faf8" stroke="#9db4a0" stroke-width="1.5"/>
+      <g id="grilleTriangle" stroke="#d8e3da" stroke-width="1"></g>
+      <g font-size="11" fill="#5a6b5e">
+        <text x="28" y="380">100 % limon</text>
+        <text x="380" y="380">100 % sable</text>
+        <text x="212" y="38">100 % argile</text>
+        <text x="6" y="200" transform="rotate(-60 60 200)">Argile %</text>
+        <text x="330" y="160" transform="rotate(60 330 160)">Limon %</text>
+        <text x="200" y="392">Sable %</text>
+      </g>
+      <g id="classesTxt" font-size="9.5" fill="#7a8a94" text-anchor="middle"></g>
+      <circle id="pt" r="6" fill="#d32f2f" stroke="#fff" stroke-width="2" opacity="0"></circle>
+      <text id="ptTxt" font-size="11" font-weight="700" fill="#b71c1c" opacity="0"></text>
+    </svg>
+    <p class="aide" style="text-align:center">Triangle USDA — classe indicative</p>
+    </div>
+    <div style="flex:1 1 300px;min-width:260px">
+      <svg viewBox="0 0 440 400" role="img" aria-label="Triangle des textures de Jamagne">
+        <polygon points="40,360 400,360 220,48.6" fill="#f7faf8" stroke="#9db4a0" stroke-width="1.5"/>
+        <g id="jamLignes" stroke="#c9c1b0" stroke-width="1.3"></g>
+        <g font-size="11" fill="#5a6b5e">
+          <text x="28" y="380">100 % limon</text>
+          <text x="380" y="380">100 % sable</text>
+          <text x="212" y="38">100 % argile</text>
+        </g>
+        <g id="jamTxt" font-size="9.5" fill="#7a8a94" text-anchor="middle"></g>
+        <circle id="ptJ" r="6" fill="#1565c0" stroke="#fff" stroke-width="2" opacity="0"></circle>
+        <text id="ptTxtJ" font-size="11" font-weight="700" fill="#0d47a1" opacity="0"></text>
+      </svg>
+      <p class="aide" style="text-align:center">Triangle de Jamagne (Aisne) — classe : <strong id="classeJamTxt">—</strong></p>
+    </div>
+  </div>
+
+  <div class="recap" id="recap"></div>
+  <div class="avert" id="ficheClasse" style="display:none"></div>
+  <div id="classeUsda" style="font-size:.95em;margin-bottom:8px"></div>
+
+  <div class="resume" id="resume"></div>
+
+  <table id="tabResultats">
+    <thead><tr><th>Formule (source)</th><th>Données utilisées</th><th class="num">RU (mm/m)</th><th class="num">RU horizon (mm)</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="excl" id="exclues"></div>
+  <div id="histo" style="margin-top:14px"></div>
+
+  <div class="card" id="blocKsat" style="display:none;margin-top:14px">
+    <div class="t" style="font-size:1.12em;font-weight:800;color:var(--bleu)">Conductivité hydraulique à saturation (Ksat)</div>
+    <p class="aide" style="margin:6px 0">Ksat&nbsp;: vitesse de déplacement <strong>vertical</strong> de l'eau (infiltration) dans un sol à saturation. Ordre de grandeur indicatif&nbsp;: RETC fournit lui aussi un Ks en sortie, les 2 à 4 estimateurs ci-dessous le prédisent depuis la texture, la MO et la densité quand elles sont disponibles (selon les sources).</p>
+    <div class="resume" id="ksatResume"></div>
+    <div id="ksatHisto"></div>
+    <p class="aide" style="margin:8px 0 0">Estimation volontairement grossière&nbsp;: le Ksat dépend surtout de la structure et de la biologie du sol (porosité, fissures, galeries de racines et de faune), pas seulement de la texture. Une page dédiée à l'hydraulique du sol approfondira ce point.</p>
+  </div>
+
+  <div class="card" id="blocVg" style="display:none;margin-top:14px">
+    <div class="t" style="font-size:1.12em;font-weight:800;color:var(--vert)">Paramètres van Genuchten–Mualem (sortie type Rosetta / RETC)</div>
+    <p class="aide" style="margin:6px 0">C'est le jeu de paramètres qu'affiche RETC après ajustement et qu'attend HYDRUS en entrée&nbsp;: θ<sub>r</sub> et θ<sub>s</sub> sont des teneurs <strong>volumiques</strong> (la même grandeur que le % vol affiché par une sonde capacitive), α et n décrivent la forme de la courbe de rétention θ(h) = θ<sub>r</sub> + (θ<sub>s</sub> − θ<sub>r</sub>) / [1 + (αh)<sup>n</sup>]<sup>1−1/n</sup> (h en cm), et le Ksat complémentaire figure dans le bloc bleu ci-dessus.</p>
+    <div class="resume" id="vgResume"></div>
+    <table id="tabVg">
+      <thead><tr><th>Source de l'estimation</th><th class="num">θr (m³/m³)</th><th class="num">θs (m³/m³)</th><th class="num">α (cm⁻¹)</th><th class="num">n</th><th class="num">θ pF 2,5 (% vol)</th><th class="num">θ pF 4,2 (% vol)</th><th class="num">RU (% vol)</th><th class="num">RU horizon (mm)</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div id="vgHisto" style="margin-top:12px"></div>
+    <p class="aide" style="margin:8px 0 0">Lecture des paramètres&nbsp;: θ<sub>s</sub> est proche de la porosité totale (1 − da/2,65)&nbsp;; un α grand signale des pores qui se vident tôt (sables), un α petit une rétention tenace (argiles)&nbsp;; un n grand traduit des tailles de pores homogènes, un n proche de 1 une courbe étalée. La première ligne reprend la moyenne de classe USDA de Carsel &amp; Parrish (1988)&nbsp;; la seconde applique le PTF continu de Vereecken et al. (1989) à vos saisies (texture + MO + da requises), dans sa forme originale avec m&nbsp;=&nbsp;1 — son n peut donc être inférieur à 1. Ces valeurs sont des estimations statistiques (fonctions de pédotransfert)&nbsp;: un ajustement RETC sur des points mesurés reste préférable pour un dimensionnement d'ouvrage. Deux lectures de la même information&nbsp;: en <strong>% vol</strong> pour confronter une sonde capacitive, en <strong>mm d'eau sur l'horizon</strong> (RU % vol × épaisseur) pour planifier une irrigation.</p>
+  </div>
+
+  <div class="avert">Rappel&nbsp;: la <strong>réserve facilement utilisable (RFU)</strong>, fraction réellement consommable avant stress hydrique, dépend surtout des <strong>espèces végétales</strong> (et du référentiel)&nbsp;: elle n'est pas affichée ici ; le calculateur d'irrigation du site l'établit pour une plantation donnée. Conversions utiles&nbsp;: RU en <strong>% vol = mm/m ÷ 10</strong> ; humidité volumique = humidité massique × densité apparente. La RU estimée ici reste une moyenne statistique&nbsp;: structure (compactage, battance) et calcaire peuvent l'écarter de la réalité.</div>
+</div>
+
+<h2>4. Comment ça marche&nbsp;?</h2>
+<div class="card sources">
+  <p>Chaque formule estime la RU comme l'eau comprise entre la capacité au champ (≈ pF&nbsp;2,5, soit −33&nbsp;kPa) et le point de flétrissement permanent (pF&nbsp;4,2, soit −1500&nbsp;kPa), à partir de jeux de données de référence propres à chaque publication. Les divergence entre formules reflètent la diversité des sols de calibration&nbsp;: c'est cette dispersion qui est affichée comme marge d'incertitude.</p>
+  <p>Ordres de grandeur pour vérifier vos saisies&nbsp;: sable ≈ 60–90&nbsp;mm/m, limon sableux ≈ 100–140&nbsp;mm/m, limon ≈ 150–190&nbsp;mm/m, argile ≈ 150–190&nbsp;mm/m. Un résultat hors de ces fourchettes doit vous alerter.</p>
+</div>
+
+<h2>5. Sources bibliographiques</h2>
+<div class="card sources">
+  <ol>
+    <li><strong>Jamagne (M.), 1967</strong> — facteurs texture (RU par classe, en mm d'eau/cm de sol). Repris dans&nbsp;: CETA des 3 rivières, « Méthode d'établissement rapide de la réserve utile du sol », d'après la carte des sols de l'Aisne. <a href="https://agriconnaissances.fr/fileadmin/user_upload/204_Eve-Agriconnaissances/Sol/Estimation_rapide_du_RU_d_un_sol.pdf" target="_blank" rel="noopener">PDF agriconnaissances.fr</a></li>
+    <li><strong>Bruand et al., 1994</strong> — table de RU par classe de texture (classes de Jamagne), entre pF 2,0 et 4,2, distinguant horizons de surface et horizons profonds. Cité dans&nbsp;: <strong>Brêthes (A.), 2010</strong> — « Évaluation de la réserve en eau des sols », réseau A FORCE, <a href="https://www.reseau-aforce.fr/sites/reseau-aforce/files/2022-01/778875~1.PDF" target="_blank" rel="noopener">PDF reseau-aforce.fr</a>.</li>
+    <li><strong>Gras (R.), 1962 ; Chiaverini (J.) &amp; Gras (R.), 1977</strong> — travaux français fondateurs sur la rétention en eau des sols (échantillons séchés et tamisés à 2 mm). Formule agronomique d'estimation de la RU volumique&nbsp;: RU = ((0,59&nbsp;×&nbsp;%argile + 0,16&nbsp;×&nbsp;%limon + 5,47) × da)&nbsp;/&nbsp;300 (da = densité apparente). Chiaverini et Gras (1977), Bulletin Technique d'Information, 324-325, p. 627-641. Repris dans&nbsp;: <strong>Bastet (G.), Bruand (A.), Quétin (P.), Cousin (I.), 1998</strong> — « Estimation des propriétés de rétention en eau des sols à l'aide de fonctions de pédotransfert (FPT) : une analyse bibliographique », <em>Étude et Gestion des Sols</em> 5(1), 7-28. <a href="https://www.afes.fr/wp-content/uploads/2023/04/EGS_5_1_BASTET.pdf" target="_blank" rel="noopener">PDF afes.fr</a> · <a href="https://hal.inrae.fr/hal-02694442" target="_blank" rel="noopener">HAL</a></li>
+    <li><strong>Cosby (B. J.), Hornberger (G. M.), Clapp (R. B.), Ginn (T. R.), 1984</strong> — A statistical exploration of the relationships of soil moisture characteristics to the physical properties of soils. <em>Water Resources Research</em> 20(6), 682–690. <a href="https://doi.org/10.1029/WR020i006p00682" target="_blank" rel="noopener">DOI</a></li>
+    <li><strong>Rawls (W. J.), Brakensiek (D. L.), Saxton (K. E.), 1982</strong> — Estimation of soil water properties. <em>Transactions of the ASAE</em> 25(5), 1316–1320. <a href="https://doi.org/10.13031/2013.33720" target="_blank" rel="noopener">DOI</a></li>
+    <li><strong>Saxton (K. E.), Rawls (W. J.), Romberger (J. S.), Papendick (R. I.), 1986</strong> — Estimating generalized soil-water characteristics from texture. <em>SSSAJ</em> 50(4), 1031–1036. <a href="https://doi.org/10.2136/sssaj1986.03615995005000040039x" target="_blank" rel="noopener">DOI</a></li>
+    <li><strong>Saxton (K. E.), Rawls (W. J.), 2006</strong> — Soil water characteristic estimates by texture and organic matter for hydrologic solutions. <em>SSSAJ</em> 70(5), 1569–1578. <a href="https://doi.org/10.2136/ssaj2005.0117" target="_blank" rel="noopener">DOI</a></li>
+    <li><strong>Gupta (S. C.), Larson (W. E.), 1979</strong> — Estimating soil water retention characteristics from particle size distribution, organic matter percent, and bulk density. <em>Water Resources Research</em> 15(6), 1633–1635. <a href="https://doi.org/10.1029/WR015i006p01633" target="_blank" rel="noopener">DOI</a></li>
+    <li><strong>Vereecken (H.), Maes (J.), Feyen (J.), Darius (P.), 1989</strong> — Estimating the soil moisture retention characteristic from texture, bulk density, and carbon content. <em>Soil Science</em> 148(6), 389–403. <a href="https://doi.org/10.1097/00010694-198912000-00001" target="_blank" rel="noopener">DOI</a></li>
+    <li><strong>Carsel (R. F.), Parrish (R. S.), 1988</strong> — Developing joint probability distributions of soil water retention characteristics. <em>Water Resources Research</em> 24(5), 755–769. <a href="https://doi.org/10.1029/WR024i005p00755" target="_blank" rel="noopener">DOI</a></li>
+    <li><strong>Arvalis, 2022</strong> — « Réservoir en eau du sol utilisable par les cultures », guide d'estimation (contribution des éléments grossiers). <a href="https://mon-ru.arvalis.fr/" target="_blank" rel="noopener">Mon Réservoir Utilisable</a></li>
+  </ol>
+  <p>Limites du triangle de Jamagne&nbsp;: transcription numérique à partir du triangle publié (Jamagne et al. 1967) et des seuils confirmés par Richer de Forges et al. (2008, <a href="https://www.afes.fr/wp-content/uploads/2023/04/EGS_15_2_richerdeforges.pdf" target="_blank" rel="noopener">Perdus dans le triangle des textures</a>)&nbsp;: sable ≥ 87,5&nbsp;%, limon moyen ≤ 17,5&nbsp;% d'argile. <strong>Formules écartées pour l'instant</strong>&nbsp;: Bruand et al. 1994 (table d'origine à retrouver) et Osty (formule à vérifier). Équations vérifiées contre le catalogue <a href="https://agrodt.github.io/ptfkit/" target="_blank" rel="noopener">ptfkit</a>. Code sous licence MIT, données CC&nbsp;BY&nbsp;4.0.</p>
+</div>
+</main>
+
+<footer>
+  <a href="index.html">🏠 Accueil</a> · <a href="mentions.html">Mentions légales</a> · Estimation indicative, ne remplace pas une analyse de laboratoire.
+</footer>
+
+<script data-goatcounter="https://mx-dk.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+"use strict";
+
+/* ---------- utilitaires ---------- */
+function val(id){
+  const v = document.getElementById(id).value.trim().replace(",", ".");
+  if (v === "") return null;
+  const n = parseFloat(v);
+  return isNaN(n) ? null : n;
+}
+function fmt(n, dec){ return n.toLocaleString("fr-FR", {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
+
+/* ---------- table Jamagne (1967) : RU en mm d'eau / cm de sol ---------- */
+/* ---------- table de Jamagne (1967) : code, RU (mm/cm), nom,
+   humidité massique CC % (pF 2,5), PFP % (pF 4,2), eau utile (g/100 g), densité apparente
+   (d'après Jamagne 1967, repris par INRAE Biljou et CETA des 3 rivières) ---------- */
+const JAMAGNE = [
+  ["S",  0.70, "Sable",               8,  3,  5, 1.35],
+  ["SL", 1.00, "Sable limoneux",      12,  5,  7, 1.40],
+  ["SA", 1.35, "Sable argileux",      19, 10,  9, 1.50],
+  ["LLS",1.20, "Limon léger sableux", 15,  7,  8, 1.50],
+  ["LS", 1.45, "Limon sableux",       19,  9, 10, 1.45],
+  ["LmS",1.60, "Limon moyen sableux", 20,  9, 11, 1.45],
+  ["LSA",1.65, "Limon sablo-argileux",22, 11, 11, 1.50],
+  ["LAS",1.75, "Limon argilo-sableux",24, 12, 12, 1.45],
+  ["LL", 1.30, "Limon léger",         17,  8,  9, 1.45],
+  ["Lm", 1.75, "Limon moyen",          23, 10, 13, 1.35],
+  ["LA", 1.95, "Limon argileux",      27, 13, 14, 1.40],
+  ["AS", 1.70, "Argile sableuse",     33, 22, 11, 1.55],
+  ["A",  1.75, "Argile",              37, 25, 12, 1.45],
+  ["AL", 1.80, "Argile limoneuse",    32, 19, 13, 1.40],
+  ["ALo",1.65, "Argile lourde",        29, 18, 11, 1.50]
+];
+
+/* ---------- granulométrie : totaux selon la grille ---------- */
+function granulo(){
+  const g = document.getElementById("grille").value;
+  if (g === "fr"){
+    const a = val("argileF"), lf = val("lf"), lg = val("lg"), sf = val("sf"), sg = val("sg");
+    const aL = [a, lf, lg, sf, sg];
+    if (aL.some(x => x === null)) return null;
+    const L = (lf||0) + (lg||0), S = (sf||0) + (sg||0);
+    const tot = (a||0) + L + S;
+    if (tot <= 0) return null;
+    return { A: a, L: L, S: S, total: tot };
+  }
+  let a = val("argile"), l = val("limon"), s = val("sable");
+  if (a === null && l === null && s === null) return null;
+  a = a ?? 0; l = l ?? 0; s = s ?? 0;
+  // complète automatiquement la donnée manquante si les deux autres sont fournies
+  if (val("argile") === null && l > 0 && s > 0) a = Math.max(0, 100 - l - s);
+  if (val("limon") === null && a > 0 && s > 0) l = Math.max(0, 100 - a - s);
+  if (val("sable") === null && a > 0 && l > 0) s = Math.max(0, 100 - a - l);
+  if (a + l + s <= 0) return null;
+  return { A: a, L: l, S: s, total: a + l + s };
+}
+
+/* ---------- les 10 formules : RU en cm³/cm³ ---------- */
+const H33 = 336.7;    // -33 kPa en cm d'eau
+const H1500 = 15295;  // -1500 kPa en cm d'eau
+
+function f_jamagne(g, mo, da, classe){ return classe ? classe[1] / 10 : null; } // RU en mm/cm -> cm³/cm³
+
+/* Bruand et al. (1994) — table de RU par classe de texture (classes de Jamagne),
+   entre pF 2,0 et pF 4,2, horizons de surface (A) et horizons profonds (E, B, C).
+   D'après le tableau transmis par M. Duquesne, cité par Brêthes (2010).
+   Les cases vides du tableau d'origine = valeurs identiques à la table de Jamagne (null ici). */
+const BRUAND = {
+  surface: { "ALo":1.24, "AL":1.36, "AS":1.73, "A":null, "LA":1.73, "LAS":1.67, "LSA":1.43, "Lm":2.13, "LmS":1.83, "LS":1.62, "LLS":null, "LL":null, "SA":1.28, "SL":1.31, "S":0.60 },
+  profond: { "ALo":1.12, "AL":1.13, "AS":0.95, "A":0.93, "LA":1.48, "LAS":1.48, "LSA":1.27, "Lm":2.07, "LmS":1.96, "LS":null, "LLS":null, "LL":null, "SA":1.03, "SL":1.16, "S":0.73 }
+};
+function f_bruand(g, mo, da, classe, typeH){
+  if (!classe) return null;
+  const t = BRUAND[typeH] || BRUAND.surface;
+  const v = t[classe[0]];
+  return ((v === null || v === undefined) ? classe[1] : v) / 10; // mm/cm -> cm³/cm³
+}
+
+function f_gras(g, da){ // Gras — formule agronomique française (RU volumique)
+  if (da === null) return null;
+  return ((0.59 * g.A + 0.16 * g.L + 5.47) * da) / 300;
+}
+
+/* ---------- classification de Jamagne (triangle de l'Aisne, 15 classes) ---------- */
+/* Limites d'après le triangle publié (Jamagne et al. 1967) : ancres textuelles sûres
+   (sable >= 87,5 %, limon moyen <= 17,5 % d'argile — Richer de Forges et al. 2008),
+   autres frontières = transcription à valider visuellement sur le triangle tracé. */
+function classeJamagne(A, L, S){
+  if (A > 50) return "ALo";
+  if (A > 35){
+    if (S >= 40 && A <= 50) return "AS";
+    if (L >= 40 && A <= 50) return "AL";
+    return "A";
+  }
+  if (A > 30){
+    if (S >= 40) return "AS";
+    if (L >= 40) return "AL";
+    return "A";
+  }
+  if (A > 25){
+    if (S >= 40) return "AS";
+    if (L >= 40) return "AL";
+    return "A";
+  }
+  if (A > 17.5){
+    if (S >= 45) return "LSA";
+    if (S >= 25) return "LAS";
+    return "LA";
+  }
+  if (A > 12){
+    if (S >= 35) return "LmS";
+    return "Lm";
+  }
+  if (A > 8){
+    if (L <= 20) return "SA";
+    if (L <= 35) return "LLS";
+    if (L <= 50) return "LS";
+    return "LL";
+  }
+  // A <= 8
+  if (S >= 87.5) return "S";
+  if (L <= 20) return "SL";
+  if (L <= 35) return "LLS";
+  if (L <= 50) return "LS";
+  return "LL";
+}
+
+function f_cosby(g){ // Cosby et al. 1984 — modèle de Campbell
+  const ts = (48.9 - 0.126 * g.S) / 100;
+  const b  = 2.91 + 0.159 * g.A;
+  const ps = Math.pow(10, 1.88 - 0.0131 * g.S); // cm d'eau
+  const t33  = ts * Math.pow(ps / H33,  1 / b);
+  const t1500= ts * Math.pow(ps / H1500, 1 / b);
+  return t33 - t1500;
+}
+
+function f_rawls82(g, mo){ // Rawls et al. 1982 (niveau granulo + MO)
+  if (mo === null) return null;
+  const t1500 = 0.0260 + 0.0050 * g.A + 0.0158 * mo;
+  const t33   = 0.2391 - 0.0019 * g.S + 0.0210 * mo + 0.72 * t1500;
+  return t33 - t1500;
+}
+
+function f_saxton86(g, da){ // Saxton et al. 1986 — Brooks-Corey, texture + densité
+  if (da === null) return null;
+  const ts = 1 - da / 2.65;
+  if (ts <= 0) return null;
+  const A = 100 * Math.exp(-4.396 - 0.0715 * g.A - 0.000488 * g.S * g.S - 0.00004285 * g.S * g.S * g.A); // kPa
+  const B = -(3.140 + 0.00222 * g.A * g.A + 0.00003484 * g.S * g.S * g.A);
+  const psiAe = A * Math.pow(ts, B); // kPa
+  if (psiAe <= 0) return null;
+  const t33   = ts * Math.pow(33   / psiAe, 1 / B);
+  const t1500 = ts * Math.pow(1500 / psiAe, 1 / B);
+  return t33 - t1500;
+}
+
+function f_saxton06(g, mo){ // Saxton & Rawls 2006 — texture + MO
+  if (mo === null) return null;
+  const S = g.S / 100, C = g.A / 100, OM = mo;
+  const t15t = -0.024*S + 0.487*C + 0.006*OM + 0.005*S*OM - 0.013*C*OM + 0.068*S*C + 0.031;
+  const t1500 = t15t + 0.14 * t15t - 0.02;
+  const t33t = -0.251*S + 0.195*C + 0.011*OM + 0.006*S*OM - 0.027*C*OM + 0.452*S*C + 0.299;
+  const t33 = t33t + 1.283 * t33t * t33t - 0.374 * t33t - 0.015;
+  return t33 - t1500;
+}
+
+function f_gupta79(g, mo, da){ // Gupta & Larson 1979 — 0,33 et 15 bar
+  if (mo === null || da === null) return null;
+  const t33 = (3.075*g.S + 5.886*g.L + 8.039*g.A + 2.208*mo) / 1000 - 14.340 * da / 100;
+  const t1500 = (-0.059*g.S + 1.142*g.L + 5.766*g.A + 2.228*mo) / 1000 + 2.671 * da / 100;
+  return t33 - t1500;
+}
+
+function f_vereecken(g, mo, da){ // Vereecken et al. 1989 — van Genuchten, texture + MO + densité
+  if (mo === null || da === null) return null;
+  const oc = mo / 1.72; // carbone organique depuis la MO
+  const tr = 0.015 + 0.005 * g.A + 0.014 * oc;
+  const ts = 0.81 - 0.283 * da + 0.001 * g.A;
+  const alpha = Math.exp(-2.486 + 0.025*g.S - 0.351*oc - 2.617*da - 0.023*g.A);
+  const n = Math.exp(0.053 - 0.009*g.S - 0.013*g.A + 0.00015*g.S*g.S);
+  const th = h => tr + (ts - tr) / (1 + Math.pow(alpha * h, n));
+  return th(H33) - th(H1500);
+}
+
+function f_carsel(g){ // Carsel & Parrish (1988) — moyenne de classe USDA, courbe van Genuchten
+  const p = CARSEL_VG[classeUsda(g.A, g.S, g.L)];
+  if (!p) return null;
+  const m = 1 - 1 / p[3];
+  const thh = h => p[0] + (p[1] - p[0]) / Math.pow(1 + Math.pow(p[2] * h, p[3]), m);
+  return thh(H33) - thh(H1500);
+}
+
+/* ---------- description des formules ---------- */
+const FORMULES = [
+  { nom: "Jamagne (1967) — table par classe de texture", besoin: "classe de texture (calculée ou saisie)", fn: (g, mo, da, cls) => f_jamagne(g, mo, da, cls) },
+  { nom: "Bruand et al. (1994) — table par classe de texture", besoin: "classe de texture (calculée) + type d'horizon", fn: (g, mo, da, cls) => f_bruand(g, mo, da, cls, document.getElementById("typeHorizon").value) },
+  { nom: "Gras — formule agronomique française", besoin: "argile + limon + densité apparente", fn: (g, mo, da) => f_gras(g, da) },
+  { nom: "Cosby et al. (1984)", besoin: "argile + limon + sable", fn: g => f_cosby(g) },
+  { nom: "Rawls et al. (1982)", besoin: "texture + MO", fn: (g, mo) => f_rawls82(g, mo) },
+  { nom: "Saxton et al. (1986)", besoin: "texture + densité apparente", fn: (g, mo, da) => f_saxton86(g, da) },
+  { nom: "Saxton & Rawls (2006)", besoin: "texture + MO", fn: (g, mo) => f_saxton06(g, mo) },
+  { nom: "Gupta & Larson (1979)", besoin: "texture + MO + densité apparente", fn: f_gupta79 },
+  { nom: "Vereecken et al. (1989)", besoin: "texture + MO + densité apparente", fn: f_vereecken },
+  { nom: "Carsel & Parrish (1988)", besoin: "classe USDA de texture (calculée)", fn: g => f_carsel(g) }
+];
+
+/* ---------- classe USDA indicative ---------- */
+function classeUsda(c, s, i){
+  if (i >= 80 && c < 12) return "Silt / limon pur";
+  if (c >= 40){
+    if (s >= 45) return "Argile sableuse";
+    if (i >= 40) return "Argile silteuse";
+    return "Argile";
+  }
+  if (c >= 35 && s >= 45) return "Argile sableuse";
+  if (c >= 27){
+    if (s >= 45 && i < 28) return "Limon argilo-sableux";
+    if (i >= 40) return "Limon argilo-silteux";
+    return "Limon argileux";
+  }
+  if (c >= 20){
+    if (s >= 45 && i < 28) return "Limon argilo-sableux";
+    if (s >= 52) return "Limon sableux";
+    if (i >= 50) return "Limon silteux";
+    return "Limon";
+  }
+  if (s >= 85 && i <= 15 && c <= 10) return "Sable";
+  if (s >= 70 && c < 15 && i < 30) return "Sable limoneux";
+  if (i >= 50) return "Limon silteux";
+  if (s >= 43) return "Limon sableux";
+  if (i >= 28) return "Limon";
+  return "Limon sableux";
+}
+
+/* ---------- van Genuchten : moyennes de classe USDA (Carsel & Parrish 1988) ---------- */
+/* [θr, θs (m³/m³), α (cm⁻¹), n] — sortie type Rosetta/RETC pour la classe USDA détectée */
+const CARSEL_VG = {
+  "Sable":                 [0.045, 0.43, 0.145, 2.68],
+  "Sable limoneux":        [0.057, 0.41, 0.124, 2.28],
+  "Limon sableux":         [0.065, 0.41, 0.075, 1.89],
+  "Limon":                 [0.078, 0.43, 0.036, 1.56],
+  "Silt / limon pur":      [0.034, 0.46, 0.016, 1.37],
+  "Limon silteux":         [0.067, 0.45, 0.020, 1.41],
+  "Limon argilo-sableux":  [0.100, 0.39, 0.059, 1.48],
+  "Limon argileux":        [0.095, 0.41, 0.019, 1.31],
+  "Limon argilo-silteux":  [0.089, 0.43, 0.010, 1.23],
+  "Argile sableuse":       [0.100, 0.38, 0.027, 1.23],
+  "Argile silteuse":       [0.070, 0.36, 0.005, 1.09],
+  "Argile":                [0.068, 0.38, 0.008, 1.09]
+};
+
+/* ---------- triangle : grille + position ---------- */
+(function(){
+  const X0=40, Y0=360, W=360, H=W*Math.sqrt(3)/2;
+  // sommet = 100 % argile ; en bas à gauche = 100 % limon ; en bas à droite = 100 % sable
+  const P = (c, s) => [X0 + (s + c/2)*W/100, Y0 - c*H/100];
+  const g = document.getElementById("grilleTriangle");
+  let d = "";
+  for (let p=20; p<100; p+=20){
+    // argile constante : du bord gauche (s=0) au bord droit (i=0)
+    d += "M" + P(p, 0).join(",") + "L" + P(p, 100 - p).join(",");
+    // sable constante : du bord inférieur (c=0) au bord droit (i=0)
+    d += "M" + P(0, p).join(",") + "L" + P(100 - p, p).join(",");
+    // limon constant : du bord gauche (s=0) au bord inférieur (c=0)
+    d += "M" + P(100 - p, 0).join(",") + "L" + P(0, 100 - p).join(",");
+  }
+  g.innerHTML = `<path d="${d}" fill="none"/>`;
+  const lbl = document.getElementById("classesTxt");
+  const classes = [
+    ["Sable", 5, 92], ["Sable limoneux", 8, 78], ["Limon sableux", 12, 58],
+    ["Limon", 15, 38], ["Limon silteux", 10, 18], ["Silt", 5, 6],
+    ["Limon argileux", 32, 30], ["Limon argilo-sableux", 25, 57],
+    ["Limon argilo-silteux", 32, 10],
+    ["Argile", 55, 22], ["Argile sableuse", 45, 50], ["Argile silteuse", 47, 8]
+  ];
+  lbl.innerHTML = classes.map(([t, c, s]) => { const [x, y] = P(c, s); return `<text x="${x}" y="${y}">${t}</text>`; }).join("");
+})();
+
+/* ---------- triangle de Jamagne : tracé des limites de classes ---------- */
+(function(){
+  const X0=40, Y0=360, W=360, H=W*Math.sqrt(3)/2;
+  const P = (c, s) => [X0 + (s + c/2)*W/100, Y0 - c*H/100];
+  const segs = [
+    // sable / sables limoneux / sables argileux
+    [[0,87.5],[8,87.5]], [[8,87.5],[8,72]], [[0,80],[15,65]], [[15,65],[15,85]],
+    // limons légers / sableux (bande A <= 12)
+    [[12,68],[12,0]], [[0,65],[12,53]], [[0,50],[12,38]],
+    // limons moyens
+    [[17.5,82.5],[17.5,0]], [[12,35],[17.5,35]],
+    // limons argileux et dérivés
+    [[17.5,45],[25,45]], [[17.5,25],[25,25]], [[25,75],[25,0]],
+    // argiles
+    [[25,40],[50,40]], [[25,35],[50,10]], [[50,50],[50,0]]
+  ];
+  let d = "";
+  segs.forEach(([a, b]) => { d += "M" + P(a[0], a[1]).join(",") + "L" + P(b[0], b[1]).join(","); });
+  document.getElementById("jamLignes").innerHTML = `<path d="${d}" fill="none"/>`;
+  const zones = [
+    ["S", 4, 93], ["SL", 4, 78], ["SA", 11, 78], ["LLS", 10, 58], ["LS", 7, 43],
+    ["LL", 6, 18], ["LmS", 15, 48], ["Lm", 15, 14], ["LSA", 21, 57], ["LAS", 21, 32],
+    ["LA", 21, 9], ["AS", 28, 50], ["AL", 28, 22], ["A", 40, 32], ["ALo", 57, 18]
+  ];
+  document.getElementById("jamTxt").innerHTML =
+    zones.map(([t, c, s]) => { const [x, y] = P(c, s); return `<text x="${x}" y="${y}">${t}</text>`; }).join("");
+})();
+function placePoint(c, s, idPt, idTxt){
+  const X0=40, Y0=360, W=360, H=W*Math.sqrt(3)/2;
+  const x = X0 + (s + c/2)*W/100, y = Y0 - c*H/100;
+  const pt = document.getElementById(idPt), tx = document.getElementById(idTxt);
+  pt.setAttribute("cx", x); pt.setAttribute("cy", y); pt.setAttribute("opacity", 1);
+  tx.setAttribute("x", Math.min(x + 10, 350)); tx.setAttribute("y", Math.max(y - 10, 16));
+  tx.setAttribute("opacity", 1);
+}
+
+/* ---------- calcul principal ---------- */
+function majGrille(){
+  document.getElementById("saisieUsda").classList.toggle("invisible", document.getElementById("grille").value === "fr");
+  document.getElementById("saisieFr").classList.toggle("invisible", document.getElementById("grille").value !== "fr");
+  calculer();
+}
+function calculer(){
+  const g = granulo();
+  const mo = val("mo"), da = val("da");
+  const ep = val("epaisseur") || 30, p = (val("pierrosite") || 0) / 100;
+  const humCaillou = parseFloat(document.getElementById("natureCailloux").value) || 0;
+
+  const corps = document.querySelector("#tabResultats tbody");
+  corps.innerHTML = "";
+  const resume = document.getElementById("resume");
+  const excl = document.getElementById("exclues");
+  excl.innerHTML = "";
+  document.getElementById("recap").innerHTML = "";
+  document.getElementById("classeUsda").innerHTML = "";
+  document.getElementById("classeJamTxt").textContent = "—";
+
+  const norm = g ? 100 / g.total : 1; // recalage si les totaux ne font pas 100
+  const gn = g ? { A: g.A * norm, L: g.L * norm, S: g.S * norm } : null;
+
+  // classe de Jamagne : calculée depuis la granulométrie (plus de choix manuel)
+  const codeAuto = gn ? classeJamagne(gn.A, gn.L, gn.S) : "";
+  const classe = JAMAGNE.find(j => j[0] === codeAuto) || null;
+  const fiche = document.getElementById("ficheClasse");
+  if (classe && gn){
+    const dadF = (da !== null) ? da : classe[6]; // même règle que la case « sonde capacitive »
+    fiche.style.display = "";
+    fiche.innerHTML = "Classe <strong>" + classe[0] + " — " + classe[2] + "</strong> (table de Jamagne)&nbsp;: capacité au champ ≈ <strong>" +
+      fmt(classe[3],0) + " % mass.</strong>, point de flétrissement ≈ <strong>" + fmt(classe[4],0) + " % mass.</strong>, eau utile ≈ " +
+      fmt(classe[5],0) + " g/100 g, da retenue " + fmt(dadF,2) + (da !== null ? " (votre saisie)" : " (indicative de la classe)") +
+      " → soit en humidité <strong>volumique</strong> (sondes capacitives)&nbsp;: CC ≈ " + fmt(classe[3]*dadF,0) + " % vol, PFP ≈ " +
+      fmt(classe[4]*dadF,0) + " % vol, RU ≈ " + fmt(classe[1]*10,0) + " % vol.";
+  } else fiche.style.display = "none";
+
+  let resultats = [], exclues = [];
+  FORMULES.forEach(f => {
+    let ru = null;
+    try { ru = f.fn(gn, mo, da, classe); } catch(e){ ru = null; }
+    if (ru !== null && isFinite(ru)) ru = Math.min(Math.max(ru, 0), 0.35);
+    if (ru === null || !isFinite(ru)){
+      let raison = "données insuffisantes";
+      if (f.nom.startsWith("Jamagne")) raison = gn ? "" : "granulométrie manquante (la classe ne peut pas être déterminée)";
+      else if (f.nom.startsWith("Bruand")) raison = gn ? "" : "granulométrie manquante (la classe ne peut pas être déterminée)";
+      else if (f.nom.startsWith("Gras")) raison = (gn ? "" : "granulométrie manquante + ") + "densité apparente non renseignée";
+      else if (f.nom.startsWith("Carsel")) raison = "granulométrie manquante (la classe USDA ne peut pas être déterminée)";
+      else if (f.nom.startsWith("Cosby")) raison = "granulométrie non renseignée";
+      else if (f.nom.includes("(1982)") || f.nom.includes("(2006)")) raison = "matière organique non renseignée" + (gn ? "" : " et granulométrie manquante");
+      else raison = f.besoin + " non renseigné(s)";
+      if (raison) exclues.push(f.nom + " : " + raison);
+      return;
+    }
+    const rmm = ru * 1000;                       // mm/m
+    const rh  = rmm * (ep / 100) * (1 - p);      // mm sur l'horizon (terre fine)
+    resultats.push({ nom: f.nom, besoin: f.besoin, rmm, rh });
+  });
+
+  // contribution des cailloux
+  let ruCaillou = 0;
+  if (p > 0 && humCaillou > 0) ruCaillou = ep * p * humCaillou;
+
+  // triangles
+  if (gn){
+    placePoint(gn.A, gn.S, "pt", "ptTxt");
+    placePoint(gn.A, gn.S, "ptJ", "ptTxtJ");
+    document.getElementById("classeJamTxt").textContent = codeAuto || "—";
+    document.getElementById("classeUsda").innerHTML = "Classe USDA indicative : <strong>" +
+      classeUsda(gn.A, gn.S, gn.L) + "</strong> · Classe de Jamagne : <strong>" + (codeAuto || "—") + "</strong>" +
+      (Math.abs(g.total - 100) > 2 ? " <span class='ko'>(total granulométrique = " + fmt(g.total,1) + " % ≠ 100 %, valeurs recalées)</span>" : "");
+  } else {
+    document.getElementById("pt").setAttribute("opacity", 0);
+    document.getElementById("ptTxt").setAttribute("opacity", 0);
+    document.getElementById("ptJ").setAttribute("opacity", 0);
+    document.getElementById("ptTxtJ").setAttribute("opacity", 0);
+  }
+
+  // tableau
+  resultats.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.nom}</td><td>${r.besoin}</td><td class="num">${fmt(r.rmm, 0)}</td><td class="num">${fmt(r.rh, 1)}</td>`;
+    corps.appendChild(tr);
+  });
+  if (ruCaillou > 0){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>Contribution des cailloux (Arvalis, 2022)</td><td>nature + pierrosité</td><td>—</td><td class="num">${fmt(ruCaillou, 1)}</td>`;
+    corps.appendChild(tr);
+  }
+
+  if (resultats.length === 0){
+    resume.innerHTML = "";
+    excl.innerHTML = "Aucune formule applicable. Renseignez au minimum la granulométrie (argile/limon/sable) ou la classe de texture.";
+    return;
+  }
+
+  // agrégation : moyenne des formules (la contribution cailloux s'ajoute en sus)
+  const rhv = resultats.map(r => r.rh);
+  const moy = rhv.reduce((a,b) => a+b, 0) / rhv.length;
+  const rfm = resultats.map(r => r.rmm);
+  const moyM = rfm.reduce((a,b) => a+b, 0) / rfm.length;
+  const min = Math.min(...rhv), max = Math.max(...rhv);
+  const tot = moy + ruCaillou;
+
+  // dispersion : écart-type des formules (mm sur l'horizon)
+  const sd = Math.sqrt(rhv.reduce((a,b) => a + Math.pow(b - moy, 2), 0) / rhv.length);
+  // humidités volumiques CC/PFP : da de l'utilisateur si fournie, sinon da de la classe de Jamagne
+  const dad = (da !== null) ? da : (classe ? classe[6] : null);
+
+  resume.innerHTML = `
+    <div class="kpis"><div class="tt">RU de l'horizon</div><div class="v2">${fmt(tot, 0)} mm</div><div class="s">${fmt(ep,0)} cm, pierrosité ${fmt(p*100,0)} %${ruCaillou ? " + cailloux" : ""}, moyenne de ${resultats.length} formules</div></div>
+    <div class="kpis"><div class="tt">Incertitudes</div><div class="st">min et max</div><div class="v3" style="font-size:1.15em">${fmt(min, 0)} – ${fmt(max, 0)} mm</div><div class="st">écart-type</div><div class="v3">${fmt(sd, 1)} mm</div></div>
+    <div class="kpis"><div class="tt">RU moyenne</div><div class="v2">${fmt(moyM, 0)} mm/m</div><div class="s">de terre fine</div></div>
+    ${(classe && dad) ? `<div class="kpis"><div class="tt">Humidité volumique</div><div class="v3">θ<sub>CC</sub> = ${fmt(classe[3]*dad, 0)} % (pF 2,5)</div><div class="v3">θ<sub>PFP</sub> = ${fmt(classe[4]*dad, 0)} % (= pF 4,2)</div></div>` : `<div class="kpis"><div class="tt">RU volumique</div><div class="v2">${fmt(moyM / 10, 1)} %</div><div class="s">% vol — lecture directe des sondes capacitives</div></div>`}`;
+
+  document.getElementById("recap").innerHTML =
+    (g ? `<span class="badge">A ${fmt(gn.A,1)} % · L ${fmt(gn.L,1)} % · S ${fmt(gn.S,1)} %</span>` : "") +
+    (mo !== null ? `<span class="badge">MO ${fmt(mo,1)} %</span>` : "") +
+    (da !== null ? `<span class="badge">da ${fmt(da,2)} g/cm³</span>` : "") +
+    (classe && classe[0] ? `<span class="badge">Classe ${classe[0]}</span>` : "") +
+    `<span class="badge">${resultats.length} formule(s) utilisée(s)</span>`;
+
+  if (exclues.length) excl.innerHTML = "Non retenues : " + exclues.join(" · ") + ".";
+
+  // histogramme : une barre par formule (RU de l'horizon)
+  const histo = document.getElementById("histo");
+  if (resultats.length){
+    const maxBar = Math.max(max, 1) * 1.12;
+    const lb = 215, bw = 420, bh = 24, gap = 8;
+    const hTot = resultats.length * (bh + gap) + 22;
+    let bars = "";
+    resultats.forEach((r, i) => {
+      const y = i * (bh + gap);
+      const w = Math.max((r.rh / maxBar) * bw, 2);
+      bars += `<rect x="${lb}" y="${y}" width="${w}" height="${bh}" rx="4" fill="#7cb342" opacity="0.9"/>`;
+      bars += `<text x="${lb - 8}" y="${y + bh/2 + 4}" text-anchor="end" font-size="12" fill="#1f2a30">${r.nom.replace(/ \(.*?\)/g, "")}</text>`;
+      bars += `<text x="${lb + w + 6}" y="${y + bh/2 + 4}" font-size="12" font-weight="700" fill="#33691e">${fmt(r.rh, 0)} mm</text>`;
+    });
+    const meanX = lb + (moy / maxBar) * bw;
+    histo.innerHTML = `<p class="aide" style="margin:2px 0 6px">RU de l'horizon estimée par chaque formule (barres) — la ligne rouge marque la moyenne.</p>` +
+      `<svg viewBox="0 0 ${lb + bw + 70} ${hTot}" style="width:100%;height:auto" role="img" aria-label="Histogramme des RU par formule">` +
+      bars +
+      `<line x1="${meanX}" y1="0" x2="${meanX}" y2="${resultats.length * (bh + gap)}" stroke="#d32f2f" stroke-width="2" stroke-dasharray="5,4"/>` +
+      `<text x="${Math.min(meanX + 4, lb + bw)}" y="${hTot - 4}" font-size="11" fill="#b71c1c">moyenne : ${fmt(moy, 0)} mm</text>` +
+      `</svg>`;
+  } else histo.innerHTML = "";
+
+  /* ---------- Ksat : conductivité hydraulique à saturation ---------- */
+  const blocK = document.getElementById("blocKsat");
+  if (gn){
+    // Cosby et al. (1984) : log10 Ksat (pouces/h) = -0,884 + 0,0153 x %sable -> mm/h
+    const ksCosby = Math.pow(10, -0.884 + 0.0153 * gn.S) * 25.4;
+    // Rawls et al. (1982) : table par classe USDA (mm/h)
+    const RAWLS_KS = { "Sable":533, "Sable limoneux":155, "Limon sableux":66, "Limon":34,
+      "Limon silteux":17, "Silt / limon pur":17, "Limon argilo-sableux":11,
+      "Limon argileux":6.6, "Limon argilo-silteux":3.8,
+      "Argile sableuse":3.0, "Argile silteuse":2.3, "Argile":1.5 };
+    const cu = classeUsda(gn.A, gn.S, gn.L);
+    const ksRawls = RAWLS_KS[cu];
+    // Carsel & Parrish (1988) : Ks moyen par classe USDA (reproduction documentée, m/s ×3,6e6 -> mm/h)
+    const CARSEL_KS = { "Sable":297, "Sable limoneux":146, "Limon sableux":44.2, "Limon":10.4,
+      "Limon silteux":4.5, "Silt / limon pur":2.5, "Limon argilo-sableux":13.1,
+      "Limon argileux":2.6, "Limon argilo-silteux":0.7,
+      "Argile sableuse":1.2, "Argile silteuse":0.2, "Argile":2.0 };
+    const ksCp = CARSEL_KS[cu];
+    // Saxton & Rawls (2006) : Ks (mm/h) = 1930 × (θs,DF − θ33,DF)^(3−λ), λ = 1/B (équations de l'article)
+    let ksSaxton = null;
+    if (mo !== null){
+      const Sx = gn.S / 100, Cx = gn.A / 100, OMx = mo;
+      const t15t = -0.024*Sx + 0.487*Cx + 0.006*OMx + 0.005*Sx*OMx - 0.013*Cx*OMx + 0.068*Sx*Cx + 0.031;
+      const t1500x = t15t + 0.14*t15t - 0.02;
+      const t33t = -0.251*Sx + 0.195*Cx + 0.011*OMx + 0.006*Sx*OMx - 0.027*Cx*OMx + 0.452*Sx*Cx + 0.299;
+      const t33x = t33t + 1.283*t33t*t33t - 0.374*t33t - 0.015;
+      const s33t = 0.278*Sx + 0.034*Cx + 0.022*OMx - 0.018*Sx*OMx - 0.027*Cx*OMx - 0.584*Sx*Cx + 0.078;
+      const s33 = s33t + 0.636*s33t - 0.107;
+      const tS = t33x + s33 - 0.097*Sx + 0.043;
+      if (t33x > 0 && t1500x > 0 && t33x > t1500x && tS > t33x){
+        const rhoN = (da !== null) ? da : (1 - tS) * 2.65;
+        const tSDF = 1 - rhoN / 2.65;
+        const t33DF = t33x - 0.2 * (tS - tSDF);
+        const Bl = (Math.log(1500) - Math.log(33)) / (Math.log(t33x) - Math.log(t1500x));
+        const dEff = Math.max(tSDF - t33DF, 1e-4);
+        const ks6 = 1930 * Math.pow(dEff, 3 - 1 / Bl);
+        if (isFinite(ks6) && ks6 > 0) ksSaxton = ks6;
+      }
+    }
+    const ksVals = [["Cosby et al. (1984)", ksCosby], ["Rawls et al. (1982)", ksRawls],
+      ["Carsel & Parrish (1988)", ksCp], ["Saxton & Rawls (2006)", ksSaxton]]
+      .filter(x => x[1] && isFinite(x[1]));
+    if (ksVals.length){
+      blocK.style.display = "";
+      const lg = ksVals.map(x => Math.log10(x[1]));
+      const ksGeo = Math.pow(10, lg.reduce((a,b) => a + b, 0) / lg.length);
+      const ksMin = Math.min(...ksVals.map(x => x[1]));
+      const ksMax = Math.max(...ksVals.map(x => x[1]));
+      document.getElementById("ksatResume").innerHTML = `
+        <div class="kpis"><div class="t" style="color:var(--bleu)">Ksat ≈ ${fmt(ksGeo, 1)} mm/h</div><div class="s">soit ${fmt(ksGeo * 24 / 10, 1)} cm/jour — moyenne géométrique de ${ksVals.length} estimation(s)</div></div>
+        <div class="kpis"><div class="t" style="color:var(--bleu)">Dispersion : ${fmt(ksMin, 1)} – ${fmt(ksMax, 1)} mm/h</div><div class="s">facteur ${fmt(ksMax / ksMin, 1)} entre estimations — le Ksat réel varie souvent d'un facteur 10 dans un même sol</div></div>`;
+      // barres en échelle log (1 à 1000 mm/h)
+      const lb = 215, bw = 420, bh = 24, gap = 8;
+      const lmin = 0, lmax = 3;
+      const hTot = ksVals.length * (bh + gap) + 22;
+      let bars = "";
+      ksVals.forEach((x, i) => {
+        const y = i * (bh + gap);
+        const w = Math.max(((Math.log10(x[1]) - lmin) / (lmax - lmin)) * bw, 2);
+        bars += `<rect x="${lb}" y="${y}" width="${w}" height="${bh}" rx="4" fill="#42a5f5" opacity="0.9"/>`;
+        bars += `<text x="${lb - 8}" y="${y + bh/2 + 4}" text-anchor="end" font-size="12" fill="#1f2a30">${x[0].replace(/ \(.*?\)/g, "")}</text>`;
+        bars += `<text x="${lb + w + 6}" y="${y + bh/2 + 4}" font-size="12" font-weight="700" fill="#0d47a1">${fmt(x[1], 1)} mm/h</text>`;
+      });
+      const meanX = lb + ((Math.log10(ksGeo) - lmin) / (lmax - lmin)) * bw;
+      document.getElementById("ksatHisto").innerHTML =
+        `<p class="aide" style="margin:2px 0 6px">Ksat estimé par chaque source (barres, échelle logarithmique) — la ligne rouge marque la moyenne géométrique.</p>` +
+        `<svg viewBox="0 0 ${lb + bw + 70} ${hTot}" style="width:100%;height:auto" role="img" aria-label="Histogramme des Ksat par source">` +
+        bars +
+        `<line x1="${meanX}" y1="0" x2="${meanX}" y2="${ksVals.length * (bh + gap)}" stroke="#d32f2f" stroke-width="2" stroke-dasharray="5,4"/>` +
+        `<text x="${Math.min(meanX + 4, lb + bw)}" y="${hTot - 4}" font-size="11" fill="#b71c1c">moyenne : ${fmt(ksGeo, 1)} mm/h</text>` +
+        `</svg>`;
+    } else blocK.style.display = "none";
+  } else blocK.style.display = "none";
+
+  /* ---------- paramètres van Genuchten–Mualem (sortie type Rosetta / RETC) ---------- */
+  const blocVg = document.getElementById("blocVg");
+  const corpsVg = document.querySelector("#tabVg tbody");
+  corpsVg.innerHTML = "";
+  document.getElementById("vgResume").innerHTML = "";
+  document.getElementById("vgHisto").innerHTML = "";
+  if (gn){
+    const cuVg = classeUsda(gn.A, gn.S, gn.L);
+    const lignesVg = [];
+    const cp = CARSEL_VG[cuVg];
+    if (cp) lignesVg.push({ src: "Classe USDA «&nbsp;" + cuVg + "&nbsp;» — moyenne de Carsel & Parrish (1988)", short: "Carsel & Parrish", p: cp, m1: false });
+    if (mo !== null && da !== null){
+      const oc = mo / 1.72;
+      lignesVg.push({ src: "Vereecken et al. (1989) — PTF continu sur vos données", short: "Vereecken et al.", m1: true, p: [
+        Math.max(0, Math.min(0.015 + 0.005 * gn.A + 0.014 * oc, 0.30)),
+        Math.min(Math.max(0.81 - 0.283 * da + 0.001 * gn.A, 0.05), 0.65),
+        Math.exp(-2.486 + 0.025 * gn.S - 0.351 * oc - 2.617 * da - 0.023 * gn.A),
+        Math.exp(0.053 - 0.009 * gn.S - 0.013 * gn.A + 0.00015 * gn.S * gn.S)
+      ] });
+    }
+    const vgChart = [];
+    lignesVg.forEach(l => {
+      const [tr, ts, a, n] = l.p;
+      if (!(ts > 0) || !(a > 0) || !(n > 0)) return;
+      if (!l.m1 && !(n > 1)) return;
+      const m = l.m1 ? 1 : 1 - 1 / n; // Vereecken 1989 : forme originale avec m = 1 (n peut être < 1)
+      const thh = h => tr + (ts - tr) / Math.pow(1 + Math.pow(a * h, n), m);
+      const t25 = thh(H33), t42 = thh(H1500);
+      const ruV = Math.min(Math.max(t25 - t42, 0), 0.35);
+      vgChart.push({ src: l.short, cc: t25 * 100, pf: t42 * 100 });
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${l.src}</td><td class="num">${fmt(tr, 3)}</td><td class="num">${fmt(ts, 3)}</td><td class="num">${fmt(a, 4)}</td><td class="num">${fmt(n, 2)}</td><td class="num">${fmt(t25 * 100, 1)}</td><td class="num">${fmt(t42 * 100, 1)}</td><td class="num">${fmt(ruV * 100, 1)}</td><td class="num">${fmt(ruV * 10 * ep * (1 - p), 1)}</td>`;
+      corpsVg.appendChild(row);
+    });
+    if (corpsVg.children.length){
+      blocVg.style.display = "";
+      let rVg = "";
+      if (da !== null) rVg += `<div class="kpis"><div class="tt">Porosité totale</div><div class="v2">${fmt(100 * (1 - da / 2.65), 0)} %</div><div class="s">1 − da/2,65 — à comparer à θs</div></div>`;
+      rVg += `<div class="kpis"><div class="tt">Lien sondes capacitives</div><div class="v3">θs, θ(pF 2,5) et θ(pF 4,2) en % vol</div><div class="s">même grandeur que le % vol de la sonde&nbsp;: la sonde lit la position courante entre θPFP et θs, la RU en est le stock utile</div></div>`;
+      rVg += `<div class="kpis"><div class="tt">Ksat</div><div class="v3">voir bloc bleu ci-dessus</div><div class="s">troisième mesure, celle de la circulation — à distinguer du stockage (θ, RU)</div></div>`;
+      document.getElementById("vgResume").innerHTML = rVg;
+      // graphique comparatif θCC / θPFP en % vol, avec moyennes et dispersion
+      if (classe && dad) vgChart.unshift({ src: "Table de Jamagne", cc: classe[3] * dad, pf: classe[4] * dad });
+      if (vgChart.length){
+        const mx2 = Math.max(...vgChart.flatMap(d => [d.cc, d.pf])) * 1.15 || 10;
+        const lb2 = 150, bw2 = 330, bh2 = 19, gapInt = 3, gapGrp = 13;
+        const gH = bh2 * 2 + gapInt;
+        const yChart = vgChart.length * (gH + gapGrp) - gapGrp;
+        const H2 = yChart + 48;
+        const x2 = v => lb2 + (v / mx2) * bw2;
+        let bars = "";
+        vgChart.forEach((d, i) => {
+          const y = i * (gH + gapGrp);
+          bars += `<rect x="${lb2}" y="${y}" width="${Math.max(x2(d.cc) - lb2, 2)}" height="${bh2}" rx="3" fill="#2e7d32"/>`;
+          bars += `<rect x="${lb2}" y="${y + bh2 + gapInt}" width="${Math.max(x2(d.pf) - lb2, 2)}" height="${bh2}" rx="3" fill="#ef6c00"/>`;
+          bars += `<text x="${lb2 - 8}" y="${y + gH - gapInt}" text-anchor="end" font-size="12" fill="#1f2a30">${d.src}</text>`;
+          bars += `<text x="${x2(d.cc) + 6}" y="${y + bh2 * 0.78}" font-size="11" font-weight="700" fill="#33691e">${fmt(d.cc, 1)}</text>`;
+          bars += `<text x="${x2(d.pf) + 6}" y="${y + bh2 * 1.78 + gapInt}" font-size="11" font-weight="700" fill="#e65100">${fmt(d.pf, 1)}</text>`;
+        });
+        const valc = vgChart.map(d => d.cc), valp = vgChart.map(d => d.pf);
+        const mcc = valc.reduce((a, b) => a + b, 0) / valc.length;
+        const mpf = valp.reduce((a, b) => a + b, 0) / valp.length;
+        bars += `<line x1="${x2(mcc)}" y1="0" x2="${x2(mcc)}" y2="${yChart}" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.75"/>`;
+        bars += `<line x1="${x2(mpf)}" y1="0" x2="${x2(mpf)}" y2="${yChart}" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.75"/>`;
+        bars += `<rect x="${lb2}" y="${yChart + 10}" width="10" height="10" fill="#2e7d32"/><text x="${lb2 + 15}" y="${yChart + 19}" font-size="11" fill="#1f2a30">θ CC (pF 2,5) — moyenne ${fmt(mcc, 1)} %, dispersion ${fmt(Math.min(...valc), 1)} – ${fmt(Math.max(...valc), 1)} %</text>`;
+        bars += `<rect x="${lb2}" y="${yChart + 26}" width="10" height="10" fill="#ef6c00"/><text x="${lb2 + 15}" y="${yChart + 35}" font-size="11" fill="#1f2a30">θ PFP (pF 4,2) — moyenne ${fmt(mpf, 1)} %, dispersion ${fmt(Math.min(...valp), 1)} – ${fmt(Math.max(...valp), 1)} %</text>`;
+        document.getElementById("vgHisto").innerHTML =
+          `<p class="aide" style="margin:2px 0 6px">Teneurs volumiques par source&nbsp;: % vol = lecture directe d'une sonde capacitive&nbsp;; l'équivalent en mm d'eau sur l'horizon (irrigation) figure dans la colonne RU horizon du tableau. Les lignes pointillées marquent les moyennes θCC / θPFP des sources affichées.</p>` +
+          `<svg viewBox="0 0 ${lb2 + bw2 + 80} ${H2}" style="width:100%;height:auto" role="img" aria-label="Comparaison des teneurs CC et PFP par source">` + bars + `</svg>`;
+      }
+    } else blocVg.style.display = "none";
+  } else blocVg.style.display = "none";
+}
+
+["argile","limon","sable","argileF","lf","lg","sf","sg","mo","da","epaisseur","pierrosite","natureCailloux","typeHorizon"].forEach(id => {
+  document.getElementById(id).addEventListener("input", calculer);
+  document.getElementById(id).addEventListener("change", calculer);
+});
+calculer();
+</script>
+</body>
+</html>
